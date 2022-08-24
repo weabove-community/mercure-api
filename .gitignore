@@ -53,3 +53,10 @@
 
 # IDE
 .idea
+
+.env
+
+docker/nginx/log/access.log
+docker/nginx/log/error.log
+docker/nginx/log/project_access.log
+docker/nginx/log/project_error.log

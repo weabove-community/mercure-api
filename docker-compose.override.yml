@@ -1,14 +1,32 @@
-version: '3'
-
+version: '3.6'
 services:
-###> doctrine/doctrine-bundle ###
-  database:
+  nginx:
+    build: docker/nginx
     ports:
-      - "5432"
-###< doctrine/doctrine-bundle ###
+      - '8080:80'
+    volumes:
+      - './:/var/www'
+      - './docker/nginx/log:/var/log/nginx/'
 
-###> symfony/mailer ###
-  mailer:
-    image: schickling/mailcatcher
-    ports: [1025, 1080]
-###< symfony/mailer ###
+  php-fpm:
+    build: docker/php-fpm
+    volumes:
+      - './:/var/www'
+
+  mariadb:
+    image: 'mariadb:10.6'
+    environment:
+      - MARIADB_DATABASE=mercure
+      - MARIADB_ROOT_USER=root
+      - MARIADB_ROOT_PASSWORD=root
+      - ALLOW_EMPTY_PASSWORD=yes
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - mariadb
+    ports:
+      - "8081:80"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      PMA_HOST: mariadb
