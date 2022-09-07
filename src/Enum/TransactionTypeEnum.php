@@ -30,4 +30,8 @@ enum TransactionTypeEnum
 
     case addMultiOffer;
 
+    /*
+     * XOXNO    auctionToken    8
+     *          listing         12
+     */
 }
