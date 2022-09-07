@@ -3,11 +3,13 @@
 namespace App\Command;
 
 use App\ElrondApi\TransactionService;
+use GuzzleHttp\Client;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use DateTime;
 
 #[AsCommand(name: 'elrond:transaction-import')]
 class TransactionImportCommand extends Command
@@ -18,6 +20,8 @@ class TransactionImportCommand extends Command
     protected function configure(): void
     {
         /*
+
+        GSPACEAPE-08bc2b-2c7c
         $this
             ->addArgument('identifier', InputArgument::REQUIRED, 'Token identifier')
         ;
@@ -32,9 +36,73 @@ class TransactionImportCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $queryParams = [];
-        echo base64_decode('RVNEVE5GVFRyYW5zZmVyQDQ3NTM1MDQxNDM0NTQxNTA0NTJkMzAzODYyNjMzMjYyQDA4OGJAMDFAMDAwMDAwMDAwMDAwMDAwMDA1MDBmM2U4OTMwNTIzOTRmMmY1ZmUzOWM2NWUzMWMwMjRiMDBlN2Q5MjczYWQ4ZEA2MTc1NjM3NDY5NmY2ZTU0NmY2YjY1NmVAMDEzMTRmYjM3MDYyOTgwMDAwQDAyYjVlM2FmMTZiMTg4MDAwMEA2M2RmZWIxYUA0NTQ3NGM0NEBAQDYyZWQ1NzFh');
+
+
+        $client = new Client();
+        $queryParams = [
+            'withScamInfo' => 'false',
+            'status' => 'success',
+            'token' => 'GSPACEAPE-08bc2b-2c7c',
+            'order'=> 'desc'
+        ];
+        $response = $client->request('GET', 'https://api.elrond.com/transactions', ['query' => $queryParams]);
+        $functions = [];
+        $marketplaces = [];
+        foreach (json_decode($response->getBody()->getContents(), true) as $dataTransaction) {
+            $message = $dataTransaction['action']['arguments']["receiverAssets"]['name'] ?? null;
+            $marketplaces[] = $dataTransaction['txHash'];
+            $marketplaces[] = $message . ' ' . $dataTransaction['function']
+
+
+            ;
+            /*
+             *
+             if ($dataTransaction['function'] == 'auctionToken') {
+                continue;
+            }
+            $data = explode("@",base64_decode($dataTransaction['data']));
+            $functions[] = count($data);
+
+            /*
+            if (!isset($functions[$dataTransaction['function']])) {
+                $functions[$dataTransaction['function']] = 1;
+            } else {
+                $functions[$dataTransaction['function']]++;
+            }
+            /*
+            $data = explode("@",base64_decode($dataTransaction['data']));
+            foreach ($data as $k => $value) {
+                if ($k == 0) {continue;}
+                dump($value, hexdec($value), hex2bin($value), '******************');
+
+            }
+
+            $time  = $dataTransaction['timestamp'];
+            $datetimeFormat = 'Y-m-d H:i:s';
+
+            $date = new \DateTime();
+            $date->setTimestamp($time);
+            echo $date->format($datetimeFormat);
+            dump(
+                '******************',
+                $dataTransaction['txHash'],
+                $date->format('Y-m-d H:i:s'),
+                $dataTransaction['function'],
+            );
+            */
+        }
+        /*$code ='RVNEVE5GVFRyYW5zZmVyQDQ3NTM1MDQxNDM0NTQxNTA0NTJkMzAzODYyNjMzMjYyQDJjN2NAMDFAMDAwMDAwMDAwMDAwMDAwMDA1MDBkM2IyODgyOGQ2MjA1MjEyNGYwN2RjZDUwZWQzMWIwODI1ZjYwZWVlMTUyNkA2YzY5NzM3NDY5NmU2N0A0ODJhMWM3MzAwMDgwMDAwQDQ4MmExYzczMDAwODAwMDBAQDQ1NDc0YzQ0QEA=';
+        dump(base64_decode($code));
+        $data = explode("@",base64_decode($code));
+        foreach ($data as $k => $value) {
+            if ($k == 0) {continue;}
+            dump($value, hexdec($value), hex2bin($value), '******************');
+
+        }
+        */
         //$this->transactionService->get($queryParams);
+
+            dump($marketplaces);
         return Command::SUCCESS;
     }
 }
