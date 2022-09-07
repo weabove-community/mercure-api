@@ -35,6 +35,22 @@ class CollectionImportCommand extends Command
 
     protected function configure(): void
     {
+        /**
+         https://www.frameit.gg/
+         Frame IT       erd1qqqqqqqqqqqqqpgq705fxpfrjne0tl3ece0rrspykq88mynn4kxs2cg43s   72263
+
+         https://deadrare.io/
+         Deadrare       erd1qqqqqqqqqqqqqpgqd9rvv2n378e27jcts8vfwynpx0gfl5ufz6hqhfy0u0  931982
+
+         https://xoxno.com/
+         xoxno          erd1qqqqqqqqqqqqqpgq6wegs2xkypfpync8mn2sa5cmpqjlvrhwz5nqgepyg8  770105
+
+         https://elrondnftswap.com/
+         krogan         erd1qqqqqqqqqqqqqpgq8xwzu82v8ex3h4ayl5lsvxqxnhecpwyvwe0sf2qj4e  186285
+
+         https://inspire.art/
+
+         */
         $this
             ->addArgument('collection', InputArgument::REQUIRED, 'Code collection')
         ;
