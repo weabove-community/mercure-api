@@ -49,10 +49,24 @@ class TransactionImportCommand extends Command
         $functions = [];
         $marketplaces = [];
         foreach (json_decode($response->getBody()->getContents(), true) as $dataTransaction) {
+            dump($dataTransaction);
             $message = $dataTransaction['action']['arguments']["receiverAssets"]['name'] ?? null;
             $marketplaces[] = $dataTransaction['txHash'];
-            $marketplaces[] = $message . ' ' . $dataTransaction['function']
+            $marketplaces[] = $message . ' ' . $dataTransaction['function'];
+            $time  = $dataTransaction['timestamp'];
+            $datetimeFormat = 'Y-m-d H:i:s';
 
+            $date = new \DateTime();
+            $date->setTimestamp($time);
+            $marketplaces[] = $date->format($datetimeFormat);
+
+            $data = explode("@",base64_decode($dataTransaction['data']));
+            foreach ($data as $k => $value) {
+                if ($k == 0) {continue;}
+                dump($value, hexdec($value), hex2bin($value), '******************');
+
+            }
+            exit;
 
             ;
             /*
@@ -70,12 +84,7 @@ class TransactionImportCommand extends Command
                 $functions[$dataTransaction['function']]++;
             }
             /*
-            $data = explode("@",base64_decode($dataTransaction['data']));
-            foreach ($data as $k => $value) {
-                if ($k == 0) {continue;}
-                dump($value, hexdec($value), hex2bin($value), '******************');
 
-            }
 
             $time  = $dataTransaction['timestamp'];
             $datetimeFormat = 'Y-m-d H:i:s';
