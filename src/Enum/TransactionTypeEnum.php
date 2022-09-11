@@ -4,31 +4,31 @@ namespace App\Enum;
 
 enum TransactionTypeEnum
 {
-    // mise au enchère
-    case auctionToken;
+    // mise en vente avec prix fixe
+    case LISTING;
 
     // achat
-    case buy;
+    case BUY;
+
+    // mise au enchère
+    case AUCTION_TOKEN;
 
     // mise à jour du prix
-    case updatePrice;
+    case UPDATE_PRICE;
 
     // retrait du NFT de la vente
-    case withdraw;
-
-    // mise en vente avec prix fixe
-    case listing;
+    case WITHDRAW;
 
     // Echange de NFT et Token
-    case nftSwap;
+    case NFT_SWAP;
 
     // mise en vente par système de lottery
-    case create;
+    case CREATE;
 
     // Emission d'une offre
-    case offer;
+    case OFFER;
 
-    case addMultiOffer;
+    case ADD_MULTI_OFFER;
 
     /*
      * XOXNO    auctionToken    8

@@ -14,7 +14,7 @@ class Transaction
     private int $id;
 
     #[ORM\Column]
-    private string $type;
+    private string $txHash;
 
     #[ORM\Column]
     private int $timestamp;
@@ -24,6 +24,12 @@ class Transaction
 
     #[ORM\Column]
     private string $ticker;
+
+    #[ORM\Column]
+    private string $identifier;
+
+    #[ORM\Column]
+    private string $receiver;
 
     /**
      * @return int
@@ -46,20 +52,21 @@ class Transaction
     /**
      * @return string
      */
-    public function getType(): string
+    public function getTxHash(): string
     {
-        return $this->type;
+        return $this->txHash;
     }
 
     /**
-     * @param string $type
+     * @param string $txHash
      * @return Transaction
      */
-    public function setType(string $type): Transaction
+    public function setTxHash(string $txHash): Transaction
     {
-        $this->type = $type;
+        $this->txHash = $txHash;
         return $this;
     }
+
 
     /**
      * @return int
@@ -115,5 +122,39 @@ class Transaction
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return $this->identifier;
+    }
 
+    /**
+     * @param string $identifier
+     * @return Transaction
+     */
+    public function setIdentifier(string $identifier): Transaction
+    {
+        $this->identifier = $identifier;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReceiver(): string
+    {
+        return $this->receiver;
+    }
+
+    /**
+     * @param string $receiver
+     * @return Transaction
+     */
+    public function setReceiver(string $receiver): Transaction
+    {
+        $this->receiver = $receiver;
+        return $this;
+    }
 }
