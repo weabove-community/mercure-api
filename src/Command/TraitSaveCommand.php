@@ -3,7 +3,6 @@
 namespace App\Command;
 
 use App\Entity\Attribute;
-use App\Entity\AttributeToken;
 use App\Entity\TraitType;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -25,9 +24,8 @@ class TraitSaveCommand extends Command
         $directory = __DIR__ . '/../../data/WeAbove/';
         $allMetadata = [];
         foreach (scandir($directory) as $filename) {
-            if ($filename == '.' || $filename == '..' || $filename == '.DS_Store') {continue;}
-            $filepath = $directory.$filename;
-            $json = file_get_contents($filepath);
+            if ($filename == '.' || $filename == '..' || $filename == '.DS_Store' || $filename == 'bis') {continue;}
+            $json = file_get_contents($directory.$filename);
             $allMetadata[] = json_decode($json, true);
         }
 
@@ -44,13 +42,14 @@ class TraitSaveCommand extends Command
             }
         }
 
+
         foreach ($attributes as $strTraitType => $values) {
             $trait = new TraitType();
             $trait->setName($strTraitType);
             foreach ($values as $value) {
                 $attribute = new Attribute();
                 $attribute->setValue($value);
-                $trait->addAttribute($attribute);
+                $attribute->setTraitType($trait);
                 $this->entityManager->persist($attribute);
             }
         }

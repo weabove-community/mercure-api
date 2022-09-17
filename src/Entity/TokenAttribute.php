@@ -51,6 +51,7 @@ class TokenAttribute
     public function setAttribute(Attribute $attribute): TokenAttribute
     {
         $this->attribute = $attribute;
+        $attribute->addTokenAttribute($this);
         return $this;
     }
 

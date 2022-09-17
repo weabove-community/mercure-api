@@ -49,15 +49,6 @@ class TraitType
         return $this;
     }
 
-    /**
-     * @param Attribute $attribute
-     * @return void
-     */
-    public function addAttribute(Attribute $attribute): void
-    {
-        $this->attributes->add($attribute);
-        $attribute->setTraitType($this);
-    }
 
     /**
      * @return ArrayCollection
