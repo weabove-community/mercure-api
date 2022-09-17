@@ -8,11 +8,15 @@
         </ul>
     </p>
     <p>
-        <ul>
+        <table>
             {% for tokenAttribute in tokenAttributes %}
-                <li>{{ tokenAttribute.attribute.traitType.name }}: {{ tokenAttribute.attribute.value }} ({{ tokenAttribute.attribute.percent|number_format(3) }}%)</li>
+                <tr>
+                    <td>{{ tokenAttribute.attribute.traitType.name }}</td>
+                    <td>{{ tokenAttribute.attribute.value }}</td>
+                    <td>{{ tokenAttribute.attribute.percent|number_format(3) }}%</td>
+                </tr>
             {% endfor %}
-        </ul>
+        </table>
     </p>
 {% endblock %}
 
