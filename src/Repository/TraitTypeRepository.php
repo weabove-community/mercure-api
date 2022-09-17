@@ -2,14 +2,14 @@
 
 namespace App\Repository;
 
-use App\Entity\Transaction;
+use App\Entity\Attribute;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class TransactionRepository extends ServiceEntityRepository
+class AttributeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Transaction::class);
+        parent::__construct($registry, Attribute::class);
     }
 }
