@@ -71,20 +71,4 @@ class Attribute
         return $this;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getTokenAttributes(): ArrayCollection
-    {
-        return $this->tokenAttributes;
-    }
-
-    public function addTokenAttribute(TokenAttribute $tokenAttribute): void
-    {
-        $this->tokenAttributes->add($tokenAttribute);
-        $tokenAttribute->setAttribute($this);
-    }
-
-
-
 }
