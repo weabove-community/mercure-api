@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: Token::class)]
@@ -13,7 +14,16 @@ class Token
     private int $id;
 
     #[ORM\Column]
-    private int $token;
+    private int $tokenId;
+
+    #[ORM\OneToMany(targetEntity: TokenAttribute::class, mappedBy: 'token')]
+    private $tokenAttributes;
+
+    public function __construct()
+    {
+        $this->tokenAttributes = new ArrayCollection();
+    }
+
 
     /**
      * @return int
@@ -50,4 +60,19 @@ class Token
         $this->token = $token;
         return $this;
     }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTokenAttributes(): ArrayCollection
+    {
+        return $this->tokenAttributes;
+    }
+
+    public function addTokenAttribute(TokenAttribute $tokenAttribute): void
+    {
+        $this->tokenAttributes->add($tokenAttribute);
+        $tokenAttribute->setAttribute($this);
+    }
+
 }
