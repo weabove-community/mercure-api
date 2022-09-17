@@ -19,6 +19,14 @@ class Attribute
     #[ORM\Column]
     private string $value;
 
+    #[ORM\OneToMany(targetEntity: TokenAttribute::class, mappedBy: 'attribute')]
+    private $tokenAttributes;
+
+    public function __construct()
+    {
+        $this->tokenAttributes = new ArrayCollection();
+    }
+
     /**
      * @return int
      */
@@ -61,6 +69,20 @@ class Attribute
     {
         $this->value = $value;
         return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTokenAttributes(): ArrayCollection
+    {
+        return $this->tokenAttributes;
+    }
+
+    public function addTokenAttribute(TokenAttribute $tokenAttribute): void
+    {
+        $this->tokenAttributes->add($tokenAttribute);
+        $tokenAttribute->setAttribute($this);
     }
 
 
