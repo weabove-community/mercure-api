@@ -22,6 +22,9 @@ class Attribute
     #[ORM\OneToMany(targetEntity: TokenAttribute::class, mappedBy: 'attribute')]
     private $tokenAttributes;
 
+    #[ORM\Column(nullable: true)]
+    private float $percent;
+
     public function __construct()
     {
         $this->tokenAttributes = new ArrayCollection();
@@ -70,5 +73,35 @@ class Attribute
         $this->value = $value;
         return $this;
     }
+
+    /**
+     * @return float
+     */
+    public function getPercent(): float
+    {
+        return $this->percent;
+    }
+
+    /**
+     * @param float $percent
+     * @return Attribute
+     */
+    public function setPercent(float $percent): Attribute
+    {
+        $this->percent = $percent;
+        return $this;
+    }
+
+    public function getTokenAttributes(): ArrayCollection
+    {
+        return $this->tokenAttributes;
+    }
+
+    public function addTokenAttribute(TokenAttribute $tokenAttribute)
+    {
+        $this->tokenAttributes->add($tokenAttribute);
+    }
+
+
 
 }

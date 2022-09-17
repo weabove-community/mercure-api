@@ -6,7 +6,6 @@ use App\Entity\Attribute;
 use App\Entity\Token;
 use App\Entity\TokenAttribute;
 use App\Repository\AttributeRepository;
-use App\Repository\TraitTypeRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,7 +36,7 @@ class TokenAttributeSaveCommand extends Command
         $attributeData = [];
         /** @var Attribute $attribute */
         foreach ($attributes as $attribute) {
-            $attributeData[$attribute->getValue()] = $attribute;
+            $attributeData[$attribute->getTraitType()->getName()][$attribute->getValue()] = $attribute;
         }
 
         $directory = __DIR__ . '/../../data/WeAbove/';
@@ -53,9 +52,10 @@ class TokenAttributeSaveCommand extends Command
 
         foreach ($allMetadata as $tokenId => $metadata) {
             $token = new Token();
-            $token->setTokenId($tokenId);
+            $token->setToken($tokenId);
             foreach ($metadata['attributes'] as $trait) {
-                $attribute = $attributeData[$trait['value']];
+
+                $attribute = $attributeData[$trait['trait_type']][$trait['value']];
                 $tokenAttribute = new TokenAttribute();
                 $tokenAttribute
                     ->setToken($token)
