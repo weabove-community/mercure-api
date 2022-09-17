@@ -1,0 +1,18 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <p>
+        <ul>
+            <li> HandoSensei Rank : {{ token.rank }}</li>
+            <li> Score : {{ token.score|number_format(3) }}</li>
+        </ul>
+    </p>
+    <p>
+        <ul>
+            {% for tokenAttribute in tokenAttributes %}
+                <li>{{ tokenAttribute.attribute.traitType.name }}: {{ tokenAttribute.attribute.value }} ({{ tokenAttribute.attribute.percent|number_format(3) }}%)</li>
+            {% endfor %}
+        </ul>
+    </p>
+{% endblock %}
+
