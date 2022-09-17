@@ -4,13 +4,10 @@ namespace App\Command;
 
 use App\Entity\Attribute;
 use App\Entity\AttributeToken;
-use App\Entity\Token;
 use App\Entity\TraitType;
-use GuzzleHttp\Client;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

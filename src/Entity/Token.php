@@ -24,7 +24,6 @@ class Token
         $this->tokenAttributes = new ArrayCollection();
     }
 
-
     /**
      * @return int
      */
@@ -46,18 +45,18 @@ class Token
     /**
      * @return int
      */
-    public function getToken(): int
+    public function getTokenId(): int
     {
-        return $this->token;
+        return $this->tokenId;
     }
 
     /**
      * @param int $token
      * @return Token
      */
-    public function setToken(int $token): Token
+    public function setTokenId(int $tokenId): Token
     {
-        $this->token = $token;
+        $this->tokenId = $tokenId;
         return $this;
     }
 
@@ -69,10 +68,5 @@ class Token
         return $this->tokenAttributes;
     }
 
-    public function addTokenAttribute(TokenAttribute $tokenAttribute): void
-    {
-        $this->tokenAttributes->add($tokenAttribute);
-        $tokenAttribute->setAttribute($this);
-    }
 
 }
