@@ -11,94 +11,58 @@ class Attribute
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private $id;
+    private int $id;
 
-    #[ORM\Column]
-    private string $type;
+    #[ORM\ManyToOne(targetEntity: TraitType::class, inversedBy: 'attributes', cascade: ['persist'])]
+    private TraitType $traitType;
 
     #[ORM\Column]
     private string $value;
 
-    #[ORM\Column]
-    private float $rarity;
-
-    #[ORM\OneToMany(targetEntity: AttributeToken::class, mappedBy: 'attribute', cascade: ["persist"])]
-    private ArrayCollection $attributeTokens;
-
-
-
     /**
-     * @return mixed
+     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
     /**
-     * @param mixed $id
+     * @return TraitType
+     */
+    public function getTraitType(): TraitType
+    {
+        return $this->traitType;
+    }
+
+    /**
+     * @param TraitType $traitType
      * @return Attribute
      */
-    public function setId($id)
+    public function setTraitType(TraitType $traitType): self
     {
-        $this->id = $id;
+        $this->traitType = $traitType;
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param mixed $type
-     * @return Attribute
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
 
     /**
-     * @param mixed $value
+     * @param string $value
      * @return Attribute
      */
-    public function setValue($value)
+    public function setValue(string $value): self
     {
         $this->value = $value;
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAttributeTokens()
-    {
-        return $this->attributeTokens;
-    }
-
-    /**
-     * @param AttributeToken $attributeToken
-     * @return Token
-     */
-    public function addAttributeToken(AttributeToken $attributeToken)
-    {
-        $this->attributeTokens->add($attributeToken);
-        $attributeToken->setToken($this);
-        return $this;
-    }
 
 
 }
