@@ -50,7 +50,7 @@ install:
 	@printf "\n"
 
 .PHONY: start
-docker-up:
+start:
 	@printf "\033[90;44m           Docker up          \033[39;0m\n"
 	@printf "\n"
 	$(DOCKER) up -d --remove-orphans
