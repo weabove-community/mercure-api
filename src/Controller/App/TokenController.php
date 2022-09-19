@@ -30,7 +30,7 @@ class TokenController extends AbstractController
     {
         $tokens = $tokenRepository->findBy([], [], 50);
 
-        return $this->render('app/token/show.html.twig', [
+        return $this->render('app/token/index.html.twig', [
             'tokens' => $tokens
         ]);
     }

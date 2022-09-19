@@ -2,6 +2,10 @@ PROJET MERCURE
 ==============
 
 # TODO
+- Initialiser une API
+- API - token : get  by tokenId
+- API - token : get tokens by criteria
+- Init React project
 - afficher l'image du NFT sur sa ficher
 - liste les NFT
 - ajouter un champ de recherche

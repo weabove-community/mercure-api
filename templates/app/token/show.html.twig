@@ -1,19 +1,24 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
-
+    <p>
+    <ul>
+        <li> HandoSensei Rank : {{ token.rank }}</li>
+        <li> Score : {{ token.score|number_format(3) }}</li>
+    </ul>
+    </p>
     <p>
     <table>
-        {% for token in tokens %}
+        {% for tokenAttribute in tokenAttributes %}
             <tr>
-                <td>{{ token.token }}</td>
-                <td>{{ token.score }}</td>
-                <td>{{ token.rank }}</td>
-
+                <td>{{ tokenAttribute.attribute.traitType.name }}</td>
+                <td>{{ tokenAttribute.attribute.value }}</td>
+                <td>{{ tokenAttribute.attribute.percent|number_format(3) }}%</td>
             </tr>
         {% endfor %}
     </table>
     </p>
+
 {% endblock %}
 
 
