@@ -1,0 +1,20 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+    <p>
+    <table>
+        {% for token in tokens %}
+            <tr>
+                <td>{{ token.token }}</td>
+                <td>{{ token.score }}</td>
+                <td>{{ token.rank }}</td>
+
+            </tr>
+        {% endfor %}
+    </table>
+    </p>
+{% endblock %}
+
+
+
