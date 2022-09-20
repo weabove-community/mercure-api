@@ -14,3 +14,8 @@ PROJET MERCURE
 - ajouter le nombre de trait par NFT
 - mettre à null les traits non défini
 - afficher le prix des NFT par plateforme
+- factoriser l'import de NFT d'une collection
+
+### Pouvoir ajouter une nouvelle collection
+
+- modification du modele (identifiant de collection, nom, ipfs, blockchain, type NFT/SFT)

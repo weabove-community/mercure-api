@@ -25,6 +25,9 @@ class Token
     #[ORM\Column(nullable: true)]
     private int $rank;
 
+    #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'tokens', cascade: ['persist'])]
+    private Collection $collection;
+
     public function __construct()
     {
         $this->tokenAttributes = new ArrayCollection();
@@ -107,6 +110,26 @@ class Token
     public function setRank(int $rank): Token
     {
         $this->rank = $rank;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCollection(): Collection
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @param Collection $collection
+     * @return Token
+     */
+    public function setCollection(Collection $collection): Token
+    {
+        $this->collection = $collection;
+        $collection->addToken($this);
+
         return $this;
     }
 
