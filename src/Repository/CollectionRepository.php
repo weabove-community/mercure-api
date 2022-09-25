@@ -12,4 +12,12 @@ class CollectionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Collection::class);
     }
+
+    public function save(Collection $collection, $persist = false)
+    {
+        $this->_em->persist($collection);
+        if ($persist) {
+            $this->_em->flush();
+        }
+    }
 }

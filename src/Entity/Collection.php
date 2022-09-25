@@ -14,13 +14,13 @@ class Collection
     private int $id;
 
     #[ORM\Column]
-    private string $type; // NFT ou SFT
-
-    #[ORM\Column]
     private string $name;
 
     #[ORM\Column]
     private string $blockchain;
+
+    #[ORM\Column]
+    private string $status;
 
     #[ORM\Column]
     private string $ipfs;
@@ -29,7 +29,19 @@ class Collection
     private string $identifier;
 
     #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'collection')]
-    private string $tokens;
+    private $tokens;
+
+    #[ORM\Column(nullable: true)]
+    private string|null $traitFileExtension = null;
+
+    #[ORM\Column(nullable: true)]
+    private string|null $pictureExtension = null;
+
+    #[ORM\Column(nullable: true)]
+    private int|null $startId;
+
+    #[ORM\Column(nullable: true)]
+    private int|null $endId;
 
     public function __construct()
     {
@@ -51,24 +63,6 @@ class Collection
     public function setId(int $id): Collection
     {
         $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     * @return Collection
-     */
-    public function setType(string $type): Collection
-    {
-        $this->type = $type;
         return $this;
     }
 
@@ -151,6 +145,96 @@ class Collection
     public function setName(string $name): Collection
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTraitFileExtension(): string
+    {
+        return $this->traitFileExtension;
+    }
+
+    /**
+     * @param string $traitFileExtension
+     * @return Collection
+     */
+    public function setTraitFileExtension(string $traitFileExtension): Collection
+    {
+        $this->traitFileExtension = $traitFileExtension;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStartId(): int
+    {
+        return $this->startId;
+    }
+
+    /**
+     * @param int $startId
+     * @return Collection
+     */
+    public function setStartId(int $startId): Collection
+    {
+        $this->startId = $startId;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEndId(): int
+    {
+        return $this->endId;
+    }
+
+    /**
+     * @param int $endId
+     * @return Collection
+     */
+    public function setEndId(int $endId): Collection
+    {
+        $this->endId = $endId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     * @return Collection
+     */
+    public function setStatus(string $status): Collection
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPictureExtension(): ?string
+    {
+        return $this->pictureExtension;
+    }
+
+    /**
+     * @param string|null $pictureExtension
+     * @return Collection
+     */
+    public function setPictureExtension(?string $pictureExtension): Collection
+    {
+        $this->pictureExtension = $pictureExtension;
         return $this;
     }
 }
