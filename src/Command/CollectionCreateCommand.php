@@ -30,7 +30,7 @@ class CollectionCreateCommand extends Command
             ->addArgument('project', InputArgument::REQUIRED, 'Project name')
             ->addArgument('identifier', InputArgument::REQUIRED, 'Smart contrart or identifier collection')
             ->addArgument('ipfs', InputArgument::REQUIRED, 'Ipfs', null)
-            ->addArgument('extension-picture', 'p', InputArgument::REQUIRED, 'File metadata extension', null)
+            ->addArgument('extension-picture', InputArgument::REQUIRED, 'File metadata extension', null)
             ->addOption('extension-metadata', 'f', InputOption::VALUE_OPTIONAL, 'File metadata extension', null)
             ->addOption('first', 's', InputOption::VALUE_OPTIONAL, 'First token', null)
             ->addOption('last', 'l', InputOption::VALUE_OPTIONAL, 'Last token', null)

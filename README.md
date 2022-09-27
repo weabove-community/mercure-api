@@ -4,6 +4,12 @@ PROJET MERCURE
 # Manipulation d'ajout d'une collection en base donnée
 
 ## Collection ERC20
+- Ajouter la nouvelle collection en BDD
+```
+  php bin/console app:collection:add [blockchain] [project] [identifier] [ipfs] [extension-picture]
+  // exemple: php bin/console app:collection:add  ethereum weabove jkflmdsqjfkdlsqm fjdksqlmfdjsqkl jpg
+```
+ 
 - Télécharger les fichiers de metadata via IPFS
 - Mettre les fichiers dans le dossier data/[smartcontract]
 - Lancer la commande pour renommer au même format de nom tous les fichiers
