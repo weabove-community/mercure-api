@@ -25,7 +25,7 @@ class Collection
     #[ORM\Column]
     private string $ipfs;
 
-    #[ORM\Column]
+    #[ORM\Column(unique: true)]
     private string $identifier;
 
     #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'collection')]

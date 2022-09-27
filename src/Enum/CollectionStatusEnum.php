@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-enum CollectionEnum: string
+enum CollectionStatusEnum: string
 {
     case ADDED = 'added';
     case ITEMS_IMPORTED = 'items-imported';

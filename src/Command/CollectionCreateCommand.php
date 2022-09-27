@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Entity\Collection;
 use App\Enum\BlockchainEnum;
-use App\Enum\CollectionEnum;
+use App\Enum\CollectionStatusEnum;
 use App\Repository\CollectionRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -52,7 +52,7 @@ class CollectionCreateCommand extends Command
             ->setIdentifier($input->getArgument('identifier'))
             ->setIpfs($input->getArgument('ipfs'))
             ->setPictureExtension($input->getArgument('extension-picture'))
-            ->setStatus(CollectionEnum::ADDED->value)
+            ->setStatus(CollectionStatusEnum::ADDED->value)
         ;
 
         if (null !== $input->getOption('extension')) {
