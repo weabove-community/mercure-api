@@ -55,8 +55,8 @@ class CollectionCreateCommand extends Command
             ->setStatus(CollectionStatusEnum::ADDED->value)
         ;
 
-        if (null !== $input->getOption('extension')) {
-            $collection->setTraitFileExtension($input->getOption('extension'));
+        if (null !== $input->getOption('extension-metadata')) {
+            $collection->setTraitFileExtension($input->getOption('extension-metadata'));
         }
 
         if (null !== $input->getOption('first')) {
