@@ -7,7 +7,7 @@ PROJET MERCURE
 - Ajouter la nouvelle collection en BDD
 ```
   php bin/console app:collection:add [blockchain] [project] [identifier] [ipfs] [extension-picture]
-  // exemple: php bin/console app:collection:add  ethereum weabove jkflmdsqjfkdlsqm fjdksqlmfdjsqkl jpg
+  // php bin/console app:collection:add  ethereum WeAbove 0xd0aaac09e7f9b794fafa9020a34ad5b906566a5c bafybeiani764y53yslrmu2lpyf7ek3idtabvlxvdjbco4sdygtezedagui gif -s 0 -l 1549
 ```
  
 - Télécharger les fichiers de metadata via IPFS

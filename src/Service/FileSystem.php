@@ -38,7 +38,7 @@ class FileSystem
     public function getMetadataDirectory(Collection $collection): string
     {
         return sprintf(
-            '%s/metadata/%s/%s',
+            '%s/metadata/%s/%s/',
             $this->getDataDirectory(),
             $collection->getBlockchain(),
             $collection->getIdentifier()

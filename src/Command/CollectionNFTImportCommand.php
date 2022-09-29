@@ -46,7 +46,11 @@ class CollectionNFTImportCommand extends Command
             throw new NotFoundResourceException('Collection identifier not found');
         }
 
-        $this->collectionImport->run($collection);
+        try {
+            $this->collectionImport->run($collection);
+        } catch (\Exception $e) {
+            throw new \Exception('Error import collection: ' . $e->getMessage());
+        }
 
         return Command::SUCCESS;
     }

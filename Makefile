@@ -1,5 +1,5 @@
 stack_name = mercure
-php_container_id = $(shell docker ps --filter name="$(stack_name)_php-fpm_1" -q)
+php_container_id = $(shell docker ps --filter name="$(stack_name)-php-fpm-1" -q)
 DOCKER=docker-compose
 
 default: help
