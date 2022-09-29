@@ -19,6 +19,9 @@ class TraitType
     #[ORM\OneToMany(targetEntity: Attribute::class, mappedBy: 'traitType')]
     private $attributes;
 
+    #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'traitTypes', cascade: ['persist'])]
+    private Collection $collection;
+
     public function __construct()
     {
         $this->attributes = new ArrayCollection();
@@ -49,12 +52,36 @@ class TraitType
         return $this;
     }
 
-
     /**
      * @return ArrayCollection
      */
     public function getAttributes(): ArrayCollection
     {
         return $this->attributes;
+    }
+
+    public function addAttribute(Attribute $attribute): void
+    {
+        $this->attributes->add($attribute);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCollection(): Collection
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @param Collection $collection
+     * @return TraitType
+     */
+    public function setCollection(Collection $collection): TraitType
+    {
+        $this->collection = $collection;
+        $this->collection->addTraitType($this);
+
+        return $this;
     }
 }

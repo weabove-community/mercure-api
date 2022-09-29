@@ -31,6 +31,12 @@ class Collection
     #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'collection')]
     private $tokens;
 
+    #[ORM\OneToMany(targetEntity: TraitType::class, mappedBy: 'collection')]
+    private $traitTypes;
+
+    #[ORM\OneToMany(targetEntity: Attribute::class, mappedBy: 'collection')]
+    private $attributes;
+
     #[ORM\Column(nullable: true)]
     private string|null $traitFileExtension = null;
 
@@ -46,6 +52,8 @@ class Collection
     public function __construct()
     {
         $this->tokens = new ArrayCollection();
+        $this->traitTypes = new ArrayCollection();
+        $this->attributes = new ArrayCollection();
     }
 
     /**
@@ -149,9 +157,9 @@ class Collection
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTraitFileExtension(): string
+    public function getTraitFileExtension(): ?string
     {
         return $this->traitFileExtension;
     }
@@ -237,4 +245,38 @@ class Collection
         $this->pictureExtension = $pictureExtension;
         return $this;
     }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTraitTypes(): ArrayCollection
+    {
+        return $this->traitTypes;
+    }
+
+    /**
+     * @param TraitType $traitType
+     */
+    public function addTraitType(TraitType $traitType): void
+    {
+        $this->traitTypes->add($traitType);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getAttributes(): ArrayCollection
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * @param Attribute $attribute
+     */
+    public function addAttribute(Attribute $attribute): void
+    {
+        $this->attributes->add($attribute);
+    }
+
+
 }

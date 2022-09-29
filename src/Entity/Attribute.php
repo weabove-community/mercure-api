@@ -22,6 +22,9 @@ class Attribute
     #[ORM\OneToMany(targetEntity: TokenAttribute::class, mappedBy: 'attribute')]
     private $tokenAttributes;
 
+    #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'attributes', cascade: ['persist'])]
+    private Collection $collection;
+
     #[ORM\Column(nullable: true)]
     private float $percent;
 
@@ -53,6 +56,8 @@ class Attribute
     public function setTraitType(TraitType $traitType): self
     {
         $this->traitType = $traitType;
+        $traitType->addAttribute($this);
+
         return $this;
     }
 
@@ -103,5 +108,23 @@ class Attribute
     }
 
 
+    /**
+     * @return Collection
+     */
+    public function getCollection(): Collection
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @param Collection $collection
+     * @return Attribute
+     */
+    public function setCollection(Collection $collection): Attribute
+    {
+        $this->collection = $collection;
+        $this->collection->addAttribute($this);
+        return $this;
+    }
 
 }
