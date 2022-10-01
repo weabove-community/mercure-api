@@ -3,48 +3,28 @@
 namespace App\Service;
 
 use App\Entity\Collection;
-use App\Enum\BlockchainEnum;
 use App\Enum\CollectionStatusEnum;
-use App\Repository\AttributeRepository;
-use App\Repository\CollectionRepository;
-use App\Service\Blockchain\ERC20\CollectionImport as ERC20CollectionImport;
 use App\Service\Model\CollectionImportInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CollectionImport
 {
     private CollectionImportInterface $collectionImport;
-
     private EntityManagerInterface $em;
-
-    private AttributeRepository $attributeRepository;
+    private CollectionImportAdapter $adapter;
 
     public function __construct(
         EntityManagerInterface $em,
-        CollectionRepository $collectionRepository,
-        FileSystem $fileSystem,
-        AttributeRepository $attributeRepository
+        CollectionImportAdapter $adapter
     )
     {
         $this->em = $em;
-        $this->collectionRepository = $collectionRepository;
-        $this->fileSystem = $fileSystem;
-        $this->attributeRepository = $attributeRepository;
-    }
-
-    private function initCollectionImport(string $blockchain): CollectionImportInterface
-    {
-        switch ($blockchain) {
-            case BlockchainEnum::ERC20->value:
-                return new ERC20CollectionImport($this->fileSystem, $this->em, $this->attributeRepository);
-            default:
-                Throw new \InvalidArgumentException(sprintf('cant handle blockchain %s', $blockchain));
-        }
+        $this->adapter = $adapter;
     }
 
     public function run(Collection $collection)
     {
-        $this->collectionImport = $this->initCollectionImport($collection->getBlockchain());
+        $this->collectionImport = $this->adapter->getCollectionImport($collection);
 
         try {
             while (CollectionStatusEnum::RANK_EXECUTED->value !== $collection->getStatus()) {

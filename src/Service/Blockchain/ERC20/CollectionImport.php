@@ -182,4 +182,13 @@ class CollectionImport implements CollectionImportInterface
         return true;
     }
 
+
+    /**
+     * @param Collection $collection
+     * @return bool
+     */
+    public function isSupport(Collection $collection): bool
+    {
+        return $collection->getBlockchain() === BlockchainEnum::ERC20->value;
+    }
 }

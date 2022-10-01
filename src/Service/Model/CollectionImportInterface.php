@@ -31,4 +31,10 @@ interface CollectionImportInterface
      * @return void
      */
     public function processRank(Collection $collection): void;
+
+    /**
+     * @param Collection $collection
+     * @return bool
+     */
+    public function isSupport(Collection $collection): bool;
 }
