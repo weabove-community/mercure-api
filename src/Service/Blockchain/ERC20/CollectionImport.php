@@ -117,6 +117,7 @@ class CollectionImport implements CollectionImportInterface
             $token = new Token();
             $token
                 ->setToken($tokenNumber)
+                ->setImageUrl($metadata['image'])
                 ->setCollection($collection);
 
             foreach ($traitTypesAttributeNull as $traitTypeName => $attributeNull) {

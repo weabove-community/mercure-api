@@ -25,6 +25,9 @@ class Token
     #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'tokens', cascade: ['persist'])]
     private Collection $collection;
 
+    #[ORM\Column]
+    private string $imageUrl;
+
     public function __construct()
     {
         $this->tokenAttributes = new ArrayCollection();
@@ -93,26 +96,20 @@ class Token
     }
 
     /**
-     * @return Collection
+     * @return string
      */
-    public function getCollection(): Collection
+    public function getImageUrl(): string
     {
-        return $this->collection;
+        return $this->imageUrl;
     }
 
     /**
-     * @param Collection $collection
+     * @param string $imageUrl
      * @return Token
      */
-    public function setCollection(Collection $collection): Token
+    public function setImageUrl(string $imageUrl): Token
     {
-        $this->collection = $collection;
-        $collection->addToken($this);
-
+        $this->imageUrl = $imageUrl;
         return $this;
     }
-
-
-
-
 }
