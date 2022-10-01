@@ -57,6 +57,7 @@ class CollectionImport implements CollectionImportInterface
             foreach ($metadata['attributes'] as $trait) {
                 if (!isset($attributes[$trait['trait_type']])) {
                     $attributes[$trait['trait_type']] = [];
+                    $attributes[$trait['trait_type']][] = null;
                 }
 
                 if (!in_array($trait['value'], $attributes[$trait['trait_type']])) {
@@ -92,14 +93,19 @@ class CollectionImport implements CollectionImportInterface
         $attributes = $this->attributeRepository->findAll();
         $attributeData = [];
         $countAttributes = [];
+        $traitTypesAttributeNull = [];
         /** @var Attribute $attribute */
         foreach ($attributes as $attribute) {
             $attributeData[$attribute->getTraitType()->getName()][$attribute->getValue()] = $attribute;
             $countAttributes[$attribute->getId()] = 0;
+            if ($attribute->getValue() === null) {
+                $traitTypesAttributeNull[$attribute->getTraitType()->getName()] = $attribute;
+            }
         }
 
         $directory = $this->fileSystem->getMetadataDirectory($collection);
         $count = 0;
+        $countTokenAttributes = 0;
         foreach (scandir($directory) as $filename) {
             if (!$this->canHandleFile($collection, $filename)) {
                 continue;
@@ -112,18 +118,27 @@ class CollectionImport implements CollectionImportInterface
             $token
                 ->setToken($tokenNumber)
                 ->setCollection($collection);
-            foreach ($metadata['attributes'] as $trait) {
-                $attribute = $attributeData[$trait['trait_type']][$trait['value']];
-                $countAttributes[$attribute->getId()]++;
-                $tokenAttribute = new TokenAttribute();
-                $tokenAttribute
-                    ->setToken($token)
-                    ->setAttribute($attribute);
-                $this->em->persist($tokenAttribute);
-            }
 
-            if (0 === $count % 1000) {
-                $this->em->flush();
+            foreach ($traitTypesAttributeNull as $traitTypeName => $attributeNull) {
+                $tokenAttribute = new TokenAttribute();
+                $tokenAttribute->setToken($token);
+                $tokenAttribute->setAttribute($attributeNull);
+                foreach ($metadata['attributes'] as $trait) {
+                    if ($trait['trait_type'] != $traitTypeName) {
+                        continue;
+                    }
+                    $attribute = $attributeData[$trait['trait_type']][$trait['value']];
+                    $tokenAttribute->setAttribute($attribute);
+                    break;
+                }
+
+                $countAttributes[$tokenAttribute->getAttribute()->getId()]++;
+
+                $this->em->persist($tokenAttribute);
+                if (0 === $countTokenAttributes % 1000) {
+                    $this->em->flush();
+                }
+                $countTokenAttributes++;
             }
             $count++;
         }
@@ -133,13 +148,18 @@ class CollectionImport implements CollectionImportInterface
             $attribute->setPercent(round($percent, 5));
             $this->em->persist($attribute);
         }
+
         $this->em->flush();
 
-        $collection->setStatus(CollectionStatusEnum::TOKEN_ATTRIBUTE_SAVED->value);
+        $collection
+            ->setStatus(CollectionStatusEnum::TOKEN_ATTRIBUTE_SAVED->value)
+            ->setSupply($count)
+        ;
     }
 
     public function processRank(Collection $collection): void
     {
+
         $collection->setStatus(CollectionStatusEnum::RANK_EXECUTED->value);
     }
 

@@ -25,6 +25,9 @@ class Collection
     #[ORM\Column]
     private string $ipfs;
 
+    #[ORM\Column(nullable: true)]
+    private int|null $supply;
+
     #[ORM\Column(unique: true)]
     private string $identifier;
 
@@ -278,5 +281,21 @@ class Collection
         $this->attributes->add($attribute);
     }
 
+    /**
+     * @return int|null
+     */
+    public function getSupply(): ?int
+    {
+        return $this->supply;
+    }
 
+    /**
+     * @param int|null $supply
+     * @return Collection
+     */
+    public function setSupply(?int $supply): Collection
+    {
+        $this->supply = $supply;
+        return $this;
+    }
 }

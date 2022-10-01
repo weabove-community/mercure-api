@@ -20,9 +20,6 @@ class Token
     private $tokenAttributes;
 
     #[ORM\Column(nullable: true)]
-    private float $score;
-
-    #[ORM\Column(nullable: true)]
     private int $rank;
 
     #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'tokens', cascade: ['persist'])]
@@ -75,24 +72,6 @@ class Token
     public function getTokenAttributes(): ArrayCollection
     {
         return $this->tokenAttributes;
-    }
-
-    /**
-     * @return float
-     */
-    public function getScore(): float
-    {
-        return $this->score;
-    }
-
-    /**
-     * @param float $score
-     * @return Token
-     */
-    public function setScore(float $score): Token
-    {
-        $this->score = $score;
-        return $this;
     }
 
     /**

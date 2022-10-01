@@ -16,8 +16,8 @@ class Attribute
     #[ORM\ManyToOne(targetEntity: TraitType::class, inversedBy: 'attributes', cascade: ['persist'])]
     private TraitType $traitType;
 
-    #[ORM\Column]
-    private string $value;
+    #[ORM\Column(nullable: true)]
+    private string|null $value;
 
     #[ORM\OneToMany(targetEntity: TokenAttribute::class, mappedBy: 'attribute')]
     private $tokenAttributes;
@@ -62,18 +62,18 @@ class Attribute
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
     /**
-     * @param string $value
+     * @param string|null $value
      * @return Attribute
      */
-    public function setValue(string $value): self
+    public function setValue(?string $value): self
     {
         $this->value = $value;
         return $this;
