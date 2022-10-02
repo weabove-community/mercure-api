@@ -4,11 +4,14 @@ namespace App\Service\Blockchain\ERC20;
 
 use App\Entity\Attribute;
 use App\Entity\Collection;
+use App\Entity\Rank;
 use App\Entity\Token;
 use App\Entity\TokenAttribute;
 use App\Entity\TraitType;
+use App\Enum\BlockchainEnum;
 use App\Enum\CollectionStatusEnum;
 use App\Repository\AttributeRepository;
+use App\Repository\TokenRepository;
 use App\Service\FileSystem;
 use App\Service\Model\CollectionImportInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,14 +24,18 @@ class CollectionImport implements CollectionImportInterface
 
     private AttributeRepository $attributeRepository;
 
+    private TokenRepository $tokenRepository;
+
     public function __construct(
         FileSystem $fileSystem,
         EntityManagerInterface $em,
-        AttributeRepository $attributeRepository)
+        AttributeRepository $attributeRepository,
+        TokenRepository $tokenRepository)
     {
         $this->em = $em;
         $this->fileSystem = $fileSystem;
         $this->attributeRepository = $attributeRepository;
+        $this->tokenRepository = $tokenRepository;
     }
 
     /**
@@ -44,6 +51,7 @@ class CollectionImport implements CollectionImportInterface
 
     public function saveTrait(Collection $collection): void
     {
+        dump('saveTrait');
         $directory = $this->fileSystem->getMetadataDirectory($collection);
 
         $attributes = [];
@@ -90,6 +98,7 @@ class CollectionImport implements CollectionImportInterface
 
     public function processTokenAttributes(Collection $collection): void
     {
+        dump('processTokenAttributes');
         $attributes = $this->attributeRepository->findAll();
         $attributeData = [];
         $countAttributes = [];
@@ -160,8 +169,48 @@ class CollectionImport implements CollectionImportInterface
 
     public function processRank(Collection $collection): void
     {
+        dump('process rank');
+        $offset = 0;
+        $limit = 1000;
+
+        while ($offset <= $collection->getSupply()) {
+            $tokens = $this->tokenRepository->findBy(
+                ['collection' => $collection],
+                ['token' => 'ASC'],
+                $limit,
+                $offset
+            );
+            $offset += $limit;
+            foreach ($tokens as $token) {
+                $rank = $this->processScoreByToken($token);
+                if (!$rank) {
+                    continue;
+                }
+                $this->em->persist($rank);
+            }
+            $this->em->flush();
+        }
 
         $collection->setStatus(CollectionStatusEnum::RANK_EXECUTED->value);
+    }
+
+    private function processScoreByToken($token)
+    {
+
+        $sumWithoutNull = 0;
+        /** @var TokenAttribute $tokenAttribute */
+        foreach ($token->getTokenAttributes() as $tokenAttribute) {
+            if ($tokenAttribute->getAttribute()->getValue() !== null) {
+                $sumWithoutNull += $tokenAttribute->getAttribute()->getPercent();
+            }
+        }
+        $rank = new Rank();
+        $rank
+            ->setToken($token)
+            ->setHandoScore($sumWithoutNull)
+        ;
+
+        return $rank;
     }
 
     /**
@@ -182,7 +231,6 @@ class CollectionImport implements CollectionImportInterface
 
         return true;
     }
-
 
     /**
      * @param Collection $collection

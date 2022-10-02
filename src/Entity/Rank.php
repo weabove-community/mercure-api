@@ -12,14 +12,14 @@ class Rank
     #[ORM\Column]
     private int $id;
 
-    #[ORM\OneToOne(targetEntity: Token::class, mappedBy: 'rank')]
+    #[ORM\OneToOne(targetEntity: Token::class, inversedBy: 'rank')]
     private Token $token;
 
     #[ORM\Column(nullable: true)]
-    private float|null $score;
+    private float|null $handoScore;
 
     #[ORM\Column(nullable: true)]
-    private int|null $rank;
+    private int|null $handoRank;
 
     /**
      * @return int
@@ -39,41 +39,6 @@ class Rank
         return $this;
     }
 
-    /**
-     * @return float|null
-     */
-    public function getScore(): ?float
-    {
-        return $this->score;
-    }
-
-    /**
-     * @param float|null $score
-     * @return Rank
-     */
-    public function setScore(?float $score): Rank
-    {
-        $this->score = $score;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getRank(): ?int
-    {
-        return $this->rank;
-    }
-
-    /**
-     * @param int|null $rank
-     * @return Rank
-     */
-    public function setRank(?int $rank): Rank
-    {
-        $this->rank = $rank;
-        return $this;
-    }
 
     /**
      * @return Token
@@ -90,6 +55,43 @@ class Rank
     public function setToken(Token $token): Rank
     {
         $this->token = $token;
+        $token->setRank($this);
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getHandoScore(): ?float
+    {
+        return $this->handoScore;
+    }
+
+    /**
+     * @param float|null $handoScore
+     * @return Rank
+     */
+    public function setHandoScore(?float $handoScore): Rank
+    {
+        $this->handoScore = $handoScore;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getHandoRank(): ?int
+    {
+        return $this->handoRank;
+    }
+
+    /**
+     * @param int|null $handoRank
+     * @return Rank
+     */
+    public function setHandoRank(?int $handoRank): Rank
+    {
+        $this->handoRank = $handoRank;
         return $this;
     }
 }

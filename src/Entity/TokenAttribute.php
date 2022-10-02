@@ -70,6 +70,8 @@ class TokenAttribute
     public function setToken(Token $token): TokenAttribute
     {
         $this->token = $token;
+        $token->addTokenAttribute($this);
+
         return $this;
     }
 

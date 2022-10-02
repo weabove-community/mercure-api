@@ -16,11 +16,11 @@ class Token
     #[ORM\Column]
     private int $token;
 
+    #[ORM\OneToOne(targetEntity: Rank::class, mappedBy: 'token')]
+    private Rank|null $rank;
+
     #[ORM\OneToMany(targetEntity: TokenAttribute::class, mappedBy: 'token')]
     private $tokenAttributes;
-
-    #[ORM\Column(nullable: true)]
-    private int $rank;
 
     #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'tokens', cascade: ['persist'])]
     private Collection $collection;
@@ -70,26 +70,55 @@ class Token
     }
 
     /**
-     * @return ArrayCollection
+     * @return mixed
      */
-    public function getTokenAttributes(): ArrayCollection
+    public function getTokenAttributes()
     {
         return $this->tokenAttributes;
     }
 
     /**
-     * @return int
+     * @param TokenAttribute $tokenAttribute
+     * @return void
      */
-    public function getRank(): int
+    public function addTokenAttribute(TokenAttribute $tokenAttribute)
+    {
+        $this->tokenAttributes->add($tokenAttribute);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCollection(): Collection
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @param Collection $collection
+     * @return Token
+     */
+    public function setCollection(Collection $collection): Token
+    {
+        $this->collection = $collection;
+        $collection->addToken($this);
+
+        return $this;
+    }
+
+    /**
+     * @return Rank|null
+     */
+    public function getRank(): ?Rank
     {
         return $this->rank;
     }
 
     /**
-     * @param int $rank
+     * @param Rank|null $rank
      * @return Token
      */
-    public function setRank(int $rank): Token
+    public function setRank(?Rank $rank): Token
     {
         $this->rank = $rank;
         return $this;
