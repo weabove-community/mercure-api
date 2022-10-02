@@ -16,6 +16,9 @@ class Token
     #[ORM\Column]
     private int $token;
 
+    #[ORM\Column]
+    private string $name;
+
     #[ORM\OneToOne(targetEntity: Rank::class, mappedBy: 'token')]
     private Rank|null $rank;
 
@@ -66,6 +69,24 @@ class Token
     public function setToken(int $token): Token
     {
         $this->token = $token;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return Token
+     */
+    public function setName(string $name): Token
+    {
+        $this->name = $name;
         return $this;
     }
 

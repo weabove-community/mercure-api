@@ -59,44 +59,53 @@ class CollectionImport implements CollectionImportInterface
     {
         dump('saveTrait');
         $directory = $this->fileSystem->getMetadataDirectory($collection);
-
         $attributes = [];
-        foreach (scandir($directory) as $filename) {
-            if (!$this->canHandleFile($collection, $filename)) {
-                continue;
-            }
 
-            $json = file_get_contents($directory.$filename);
-            $metadata = json_decode($json, true);
-            foreach ($metadata['attributes'] as $trait) {
-                if (!isset($attributes[$trait['trait_type']])) {
-                    $attributes[$trait['trait_type']] = [];
-                    $attributes[$trait['trait_type']][] = null;
+        try {
+            foreach (scandir($directory) as $filename) {
+                if (!$this->canHandleFile($collection, $filename)) {
+                    continue;
                 }
 
-                if (!in_array($trait['value'], $attributes[$trait['trait_type']])) {
-                    $attributes[$trait['trait_type']][] = $trait['value'];
+                $json = file_get_contents($directory.$filename);
+                $metadata = json_decode($json, true);
+                foreach ($metadata['attributes'] as $trait) {
+                    if (!isset($attributes[$trait['trait_type']])) {
+                        $attributes[$trait['trait_type']] = [];
+                        $attributes[$trait['trait_type']][] = null;
+                    }
+
+                    if (!in_array($trait['value'], $attributes[$trait['trait_type']])) {
+                        $attributes[$trait['trait_type']][] = $trait['value'];
+                    }
                 }
             }
+        } catch (\Exception $e) {
+             throw new \Exception('Sort all attributes failed');
         }
 
-        foreach ($attributes as $strTraitType => $values) {
-            $trait = new TraitType();
-            $trait
-                ->setName($strTraitType)
-                ->setCollection($collection)
-            ;
-            foreach ($values as $value) {
-                $attribute = new Attribute();
-                $attribute
-                    ->setValue($value)
+        try {
+            foreach ($attributes as $strTraitType => $values) {
+                $trait = new TraitType();
+                $trait
+                    ->setName($strTraitType)
                     ->setCollection($collection)
-                    ->setTraitType($trait)
                 ;
+                foreach ($values as $value) {
+                    $attribute = new Attribute();
+                    $attribute
+                        ->setValue($value)
+                        ->setCollection($collection)
+                        ->setTraitType($trait)
+                    ;
 
-                $this->em->persist($attribute);
+                    $this->em->persist($attribute);
+                }
             }
+        } catch (\Exception $e) {
+            throw new \Exception('Save attributes failed');
         }
+
         $collection->setStatus(CollectionStatusEnum::TRAIT_SAVED->value);
         $this->em->persist($collection);
         $this->em->flush();
@@ -128,10 +137,11 @@ class CollectionImport implements CollectionImportInterface
 
             $json = file_get_contents($directory.$filename);
             $metadata = json_decode($json, true);
-            $tokenNumber = substr(strrchr($metadata['name'], "#"), 1);
+            $tokenNumber = $this->defineTokenByFilename($collection, $filename);
             $token = new Token();
             $token
                 ->setToken($tokenNumber)
+                ->setName($metadata['name'])
                 ->setImageUrl($metadata['image'])
                 ->setCollection($collection);
 
@@ -165,44 +175,49 @@ class CollectionImport implements CollectionImportInterface
             $this->em->persist($attribute);
         }
 
-        $this->em->flush();
 
         $collection
             ->setStatus(CollectionStatusEnum::TOKEN_ATTRIBUTE_SAVED->value)
             ->setSupply($count)
         ;
+        $this->em->flush();
     }
 
     public function processRank(Collection $collection): void
     {
+        $this->processScoreCollection($collection);
         dump('process rank');
+        $ranking = 1;
+        $limit = 500;
         $offset = 0;
-        $limit = 1000;
-
-        while ($offset <= $collection->getSupply()) {
-            $tokens = $this->tokenRepository->findBy(
+        while ($ranking < $collection->getSupply()) {
+            $ranks = $this->rankRepository->findBy(
                 ['collection' => $collection],
-                ['token' => 'ASC'],
+                ['handoScore' => 'ASC'],
                 $limit,
                 $offset
             );
-            $offset += $limit;
-            foreach ($tokens as $token) {
-                $rank = $this->processScoreByToken($token);
-                if (!$rank) {
-                    continue;
-                }
+            foreach ($ranks as $rank) {
+                dump("rank id : " . $rank->getId(). ' rank : ' . $ranking);
+                $rank->setHandoRank($ranking);
                 $this->em->persist($rank);
+                $ranking++;
             }
+            $offset += $limit;
             $this->em->flush();
         }
 
+
+
+
         $collection->setStatus(CollectionStatusEnum::RANK_EXECUTED->value);
+        $this->em->flush();
+
+        dump('process END rank');
     }
 
     private function processScoreByToken($token)
     {
-
         $sumWithoutNull = 0;
         /** @var TokenAttribute $tokenAttribute */
         foreach ($token->getTokenAttributes() as $tokenAttribute) {
@@ -213,10 +228,39 @@ class CollectionImport implements CollectionImportInterface
         $rank = new Rank();
         $rank
             ->setToken($token)
+            ->setCollection($token->getCollection())
             ->setHandoScore($sumWithoutNull)
         ;
 
         return $rank;
+    }
+
+    private function processScoreCollection(Collection $collection): void
+    {
+        dump('process ScoreCollection');
+        $offset = 0;
+        $limit = 1000;
+        $count = 0;
+        while ($offset <= $collection->getSupply()) {
+            $tokens = $this->tokenRepository->findBy(
+                ['collection' => $collection],
+                ['id' => 'ASC'],
+                $limit,
+                $offset
+            );
+            $offset += $limit;
+            foreach ($tokens as $token) {
+                //dump("persist rank score token id :" . $token->getId());
+                $rank = $this->processScoreByToken($token);
+                $this->em->persist($rank);
+                if ($count % 1000 === 0) {
+                    $this->em->flush();
+                }
+                $count++;
+            }
+        }
+        $this->em->flush();
+        dump('end process ScoreCollection');
     }
 
     /**
@@ -226,7 +270,7 @@ class CollectionImport implements CollectionImportInterface
      */
     private function canHandleFile(Collection $collection, $filename)
     {
-        if ($filename == '.' || $filename == '..') {
+        if ($filename == '.' || $filename == '..' || $filename == '.DS_Store') {
             return false;
         }
 
@@ -236,6 +280,17 @@ class CollectionImport implements CollectionImportInterface
         }
 
         return true;
+    }
+
+    private function defineTokenByFilename(Collection $collection, string $filename)
+    {
+        if ($collection->getTraitFileExtension()) {
+            $token = substr($filename, 0, strlen($collection->getTraitFileExtension()) + 1);
+        } else {
+            $token = $filename;
+        }
+
+        return abs((int) $token);
     }
 
     /**
