@@ -40,6 +40,9 @@ class Collection
     #[ORM\OneToMany(targetEntity: Attribute::class, mappedBy: 'collection')]
     private $attributes;
 
+    #[ORM\OneToMany(targetEntity: Rank::class, mappedBy: 'collection')]
+    private $ranks;
+
     #[ORM\Column(nullable: true)]
     private string|null $traitFileExtension = null;
 
@@ -55,6 +58,7 @@ class Collection
     public function __construct()
     {
         $this->tokens = new ArrayCollection();
+        $this->ranks = new ArrayCollection();
         $this->traitTypes = new ArrayCollection();
         $this->attributes = new ArrayCollection();
     }
@@ -297,5 +301,21 @@ class Collection
     {
         $this->supply = $supply;
         return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getRanks(): ArrayCollection
+    {
+        return $this->ranks;
+    }
+
+    /**
+     * @param Rank $rank
+     */
+    public function addRank(Rank $rank)
+    {
+        $this->ranks->add($rank);
     }
 }

@@ -11,6 +11,7 @@ use App\Entity\TraitType;
 use App\Enum\BlockchainEnum;
 use App\Enum\CollectionStatusEnum;
 use App\Repository\AttributeRepository;
+use App\Repository\RankRepository;
 use App\Repository\TokenRepository;
 use App\Service\FileSystem;
 use App\Service\Model\CollectionImportInterface;
@@ -26,16 +27,21 @@ class CollectionImport implements CollectionImportInterface
 
     private TokenRepository $tokenRepository;
 
+    private RankRepository $rankRepository;
+
     public function __construct(
         FileSystem $fileSystem,
         EntityManagerInterface $em,
         AttributeRepository $attributeRepository,
-        TokenRepository $tokenRepository)
+        TokenRepository $tokenRepository,
+        RankRepository $rankRepository
+    )
     {
         $this->em = $em;
         $this->fileSystem = $fileSystem;
         $this->attributeRepository = $attributeRepository;
         $this->tokenRepository = $tokenRepository;
+        $this->rankRepository = $rankRepository;
     }
 
     /**

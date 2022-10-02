@@ -15,6 +15,9 @@ class Rank
     #[ORM\OneToOne(targetEntity: Token::class, inversedBy: 'rank')]
     private Token $token;
 
+    #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'rank')]
+    private Collection $collection;
+
     #[ORM\Column(nullable: true)]
     private float|null $handoScore;
 
@@ -56,6 +59,24 @@ class Rank
     {
         $this->token = $token;
         $token->setRank($this);
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCollection(): Collection
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @param Collection $collection
+     * @return Rank
+     */
+    public function setCollection(Collection $collection): Rank
+    {
+        $this->collection = $collection;
         return $this;
     }
 
