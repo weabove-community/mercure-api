@@ -22,9 +22,6 @@ class Collection
     #[ORM\Column]
     private string $status;
 
-    #[ORM\Column]
-    private string $ipfs;
-
     #[ORM\Column(nullable: true)]
     private int|null $supply;
 
@@ -45,9 +42,6 @@ class Collection
 
     #[ORM\Column(nullable: true)]
     private string|null $traitFileExtension = null;
-
-    #[ORM\Column(nullable: true)]
-    private string|null $pictureExtension = null;
 
     #[ORM\Column(nullable: true)]
     private int|null $startId;
@@ -96,24 +90,6 @@ class Collection
     public function setBlockchain(string $blockchain): Collection
     {
         $this->blockchain = $blockchain;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIpfs(): string
-    {
-        return $this->ipfs;
-    }
-
-    /**
-     * @param string $ipfs
-     * @return Collection
-     */
-    public function setIpfs(string $ipfs): Collection
-    {
-        $this->ipfs = $ipfs;
         return $this;
     }
 
@@ -232,24 +208,6 @@ class Collection
     public function setStatus(string $status): Collection
     {
         $this->status = $status;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPictureExtension(): ?string
-    {
-        return $this->pictureExtension;
-    }
-
-    /**
-     * @param string|null $pictureExtension
-     * @return Collection
-     */
-    public function setPictureExtension(?string $pictureExtension): Collection
-    {
-        $this->pictureExtension = $pictureExtension;
         return $this;
     }
 

@@ -29,8 +29,6 @@ class CollectionCreateCommand extends Command
             ->addArgument('blockchain', InputArgument::REQUIRED, 'Blockchain (ERC20, Elrond)')
             ->addArgument('project', InputArgument::REQUIRED, 'Project name')
             ->addArgument('identifier', InputArgument::REQUIRED, 'Smart contrart or identifier collection')
-            ->addArgument('ipfs', InputArgument::REQUIRED, 'Ipfs', null)
-            ->addArgument('extension-picture', InputArgument::REQUIRED, 'File metadata extension', null)
             ->addOption('extension-metadata', 'f', InputOption::VALUE_OPTIONAL, 'File metadata extension', null)
             ->addOption('first', 's', InputOption::VALUE_OPTIONAL, 'First token', null)
             ->addOption('last', 'l', InputOption::VALUE_OPTIONAL, 'Last token', null)
@@ -50,8 +48,6 @@ class CollectionCreateCommand extends Command
             ->setBlockchain($blockchain->value)
             ->setName($input->getArgument('project'))
             ->setIdentifier($input->getArgument('identifier'))
-            ->setIpfs($input->getArgument('ipfs'))
-            ->setPictureExtension($input->getArgument('extension-picture'))
             ->setStatus(CollectionStatusEnum::ADDED->value)
         ;
 
