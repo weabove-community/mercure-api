@@ -14,10 +14,11 @@ use App\Repository\AttributeRepository;
 use App\Repository\RankRepository;
 use App\Repository\TokenRepository;
 use App\Service\FileSystem;
+use App\Service\Model\CollectionImportAbstract;
 use App\Service\Model\CollectionImportInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class CollectionImport implements CollectionImportInterface
+class CollectionImport extends CollectionImportAbstract implements CollectionImportInterface
 {
     private FileSystem $fileSystem;
 
@@ -263,35 +264,7 @@ class CollectionImport implements CollectionImportInterface
         dump('end process ScoreCollection');
     }
 
-    /**
-     * @param Collection $collection
-     * @param string $filename
-     * @return bool
-     */
-    private function canHandleFile(Collection $collection, $filename)
-    {
-        if ($filename == '.' || $filename == '..' || $filename == '.DS_Store') {
-            return false;
-        }
 
-        if ($collection->getTraitFileExtension() !== null &&
-            pathinfo($filename, PATHINFO_EXTENSION) !== $collection->getTraitFileExtension()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function defineTokenByFilename(Collection $collection, string $filename)
-    {
-        if ($collection->getTraitFileExtension()) {
-            $token = substr($filename, 0, strlen($collection->getTraitFileExtension()) + 1);
-        } else {
-            $token = $filename;
-        }
-
-        return abs((int) $token);
-    }
 
     /**
      * @param Collection $collection
