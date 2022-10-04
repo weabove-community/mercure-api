@@ -26,7 +26,7 @@ class Attribute
     private Collection $collection;
 
     #[ORM\Column(nullable: true)]
-    private float $percent;
+    private float|null $percent;
 
     public function __construct()
     {
@@ -80,18 +80,18 @@ class Attribute
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getPercent(): float
+    public function getPercent(): ?float
     {
         return $this->percent;
     }
 
     /**
-     * @param float $percent
+     * @param float|null $percent
      * @return Attribute
      */
-    public function setPercent(float $percent): Attribute
+    public function setPercent(?float $percent): Attribute
     {
         $this->percent = $percent;
         return $this;
