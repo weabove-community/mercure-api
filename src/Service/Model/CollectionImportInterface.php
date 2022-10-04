@@ -22,9 +22,17 @@ interface CollectionImportInterface
 
     /**
      * Save all traits by token
+     * @param Collection $collection
      * @return void
      */
-    public function processTokenAttributes(Collection $collection): void;
+    public function processTokenAttributesBinding(Collection $collection): void;
+
+    /**
+     * Count attributes linked
+     * @param Collection $collection
+     * @return void
+     */
+    public function processAttributePercent(Collection $collection): void;
 
     /**
      * Define rank

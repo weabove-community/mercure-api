@@ -36,9 +36,12 @@ class CollectionImport
                         $this->collectionImport->saveTrait($collection);
                         break;
                     case CollectionStatusEnum::TRAIT_SAVED->value:
-                        $this->collectionImport->processTokenAttributes($collection);
+                        $this->collectionImport->processTokenAttributesBinding($collection);
                         break;
                     case CollectionStatusEnum::TOKEN_ATTRIBUTE_SAVED->value:
+                        $this->collectionImport->processAttributePercent($collection);
+                        break;
+                    case CollectionStatusEnum::ATTRIBUTE_PERCENT_PROCESSED->value:
                         $this->collectionImport->processRank($collection);
                         break;
                     default:

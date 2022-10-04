@@ -24,15 +24,4 @@ abstract class CollectionImportAbstract
 
         return true;
     }
-
-    protected  function defineTokenByFilename(Collection $collection, string $filename)
-    {
-        if ($collection->getTraitFileExtension()) {
-            $token = substr($filename, 0, strlen($collection->getTraitFileExtension()) + 1);
-        } else {
-            $token = $filename;
-        }
-
-        return abs((int) $token);
-    }
 }
