@@ -5,7 +5,6 @@ namespace App\Service\Blockchain\ERC20;
 use App\Entity\Attribute;
 use App\Entity\Collection;
 use App\Entity\Rank;
-use App\Entity\Token;
 use App\Entity\TokenAttribute;
 use App\Entity\TraitType;
 use App\Enum\BlockchainEnum;
@@ -13,9 +12,11 @@ use App\Enum\CollectionStatusEnum;
 use App\Repository\AttributeRepository;
 use App\Repository\RankRepository;
 use App\Repository\TokenRepository;
+use App\Service\AttributeService;
 use App\Service\FileSystem;
 use App\Service\Model\CollectionImportAbstract;
 use App\Service\Model\CollectionImportInterface;
+use App\Service\TokenService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CollectionImport extends CollectionImportAbstract implements CollectionImportInterface
@@ -30,19 +31,27 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
 
     private RankRepository $rankRepository;
 
+    private AttributeService $attributeService;
+
+    private TokenService $tokenService;
+
     public function __construct(
         FileSystem $fileSystem,
         EntityManagerInterface $em,
         AttributeRepository $attributeRepository,
         TokenRepository $tokenRepository,
-        RankRepository $rankRepository
+        RankRepository $rankRepository,
+        AttributeService $attributeService,
+        TokenService $tokenService
     )
     {
         $this->em = $em;
         $this->fileSystem = $fileSystem;
-        $this->attributeRepository = $attributeRepository;
         $this->tokenRepository = $tokenRepository;
+        $this->attributeRepository = $attributeRepository;
         $this->rankRepository = $rankRepository;
+        $this->attributeService = $attributeService;
+        $this->tokenService = $tokenService;
     }
 
     /**
@@ -112,21 +121,14 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
         $this->em->flush();
     }
 
-    public function processTokenAttributes(Collection $collection): void
+    // todo : à découper
+    // todo compter le nombre d'affectation d'un attribut
+    public function processTokenAttributesBinding(Collection $collection): void
     {
         dump('processTokenAttributes');
-        $attributes = $this->attributeRepository->findAll();
-        $attributeData = [];
-        $countAttributes = [];
-        $traitTypesAttributeNull = [];
-        /** @var Attribute $attribute */
-        foreach ($attributes as $attribute) {
-            $attributeData[$attribute->getTraitType()->getName()][$attribute->getValue()] = $attribute;
-            $countAttributes[$attribute->getId()] = 0;
-            if ($attribute->getValue() === null) {
-                $traitTypesAttributeNull[$attribute->getTraitType()->getName()] = $attribute;
-            }
-        }
+
+        $attributeData = $this->attributeService->getAttributesWithValue($collection);
+        $nullAttributeData = $this->attributeService->getAttributesWithoutValue($collection);
 
         $directory = $this->fileSystem->getMetadataDirectory($collection);
         $count = 0;
@@ -139,43 +141,31 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
             $json = file_get_contents($directory.$filename);
             $metadata = json_decode($json, true);
             $tokenNumber = $this->defineTokenByFilename($collection, $filename);
-            $token = new Token();
-            $token
-                ->setToken($tokenNumber)
-                ->setName($metadata['name'])
-                ->setImageUrl($metadata['image'])
-                ->setCollection($collection);
+            $token = $this->tokenService->create($collection, $tokenNumber, $metadata['name'], $metadata['image']);
 
-            foreach ($traitTypesAttributeNull as $traitTypeName => $attributeNull) {
+            $attributeKeyValue = $this->attributeService->sortMetadataAttributesByKeyValue($metadata['attributes']);
+
+            foreach ($nullAttributeData as $traitTypeName => $attributeNull) {
+
+                if (isset($attributeKeyValue[$traitTypeName])) {
+                    $value = $attributeKeyValue[$traitTypeName];
+                    $attribute = $attributeData[$traitTypeName][$value];
+                } else {
+                    $attribute = $attributeNull;
+                }
                 $tokenAttribute = new TokenAttribute();
                 $tokenAttribute->setToken($token);
-                $tokenAttribute->setAttribute($attributeNull);
-                foreach ($metadata['attributes'] as $trait) {
-                    if ($trait['trait_type'] != $traitTypeName) {
-                        continue;
-                    }
-                    $attribute = $attributeData[$trait['trait_type']][$trait['value']];
-                    $tokenAttribute->setAttribute($attribute);
-                    break;
-                }
-
-                $countAttributes[$tokenAttribute->getAttribute()->getId()]++;
+                $tokenAttribute->setAttribute($attribute);
 
                 $this->em->persist($tokenAttribute);
-                if (0 === $countTokenAttributes % 1000) {
+                if (0 == $countTokenAttributes % 500) {
+                    dump('flush ' . $count);
                     $this->em->flush();
                 }
                 $countTokenAttributes++;
             }
             $count++;
         }
-
-        foreach ($attributes as $attribute) {
-            $percent = $countAttributes[$attribute->getId()]*(100/($count));
-            $attribute->setPercent(round($percent, 5));
-            $this->em->persist($attribute);
-        }
-
 
         $collection
             ->setStatus(CollectionStatusEnum::TOKEN_ATTRIBUTE_SAVED->value)
@@ -184,56 +174,56 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
         $this->em->flush();
     }
 
-    public function processRank(Collection $collection): void
+    public function processAttributePercent(Collection $collection): void
     {
-        $this->processScoreCollection($collection);
-        dump('process rank');
-        $ranking = 1;
-        $limit = 500;
-        $offset = 0;
-        while ($ranking < $collection->getSupply()) {
-            $ranks = $this->rankRepository->findBy(
-                ['collection' => $collection],
-                ['handoScore' => 'ASC'],
-                $limit,
-                $offset
-            );
-            foreach ($ranks as $rank) {
-                dump("rank id : " . $rank->getId(). ' rank : ' . $ranking);
-                $rank->setHandoRank($ranking);
-                $this->em->persist($rank);
-                $ranking++;
+        dump('processAttributePercent');
+        $countAttributes = [];
+        $attributeData = $this->attributeService->getAttributesSortTraitNameValue($collection);
+        $nullAttributeData = $this->attributeService->getAttributesWithoutValue($collection);
+        $directory = $this->fileSystem->getMetadataDirectory($collection);
+        foreach (scandir($directory) as $filename) {
+            if (!$this->canHandleFile($collection, $filename)) {
+                continue;
             }
-            $offset += $limit;
-            $this->em->flush();
+            $json = file_get_contents($directory.$filename);
+            $metadata = json_decode($json, true);
+            $metadataAttributesKeyValue = $this->attributeService->sortMetadataAttributesByKeyValue($metadata['attributes']);
+
+            foreach ($nullAttributeData as $traitTypeName => $nullAttribute) {
+                if (isset($metadataAttributesKeyValue[$traitTypeName])) {
+                    $val = $metadataAttributesKeyValue[$traitTypeName];
+                    $attribute = $attributeData[$traitTypeName][$val];
+                } else {
+                    $attribute = $nullAttribute;
+                }
+
+                if (isset($countAttributes[$attribute->getId()])) {
+                    $countAttributes[$attribute->getId()]++;
+                    continue;
+                }
+
+                $countAttributes[$attribute->getId()] = 1;
+            }
         }
 
+        unset($attributeData);
+        unset($nullAttributeData);
 
+        $attributes = $this->attributeRepository->findBy(['collection' => $collection]);
 
+        foreach ($attributes as $attribute) {
+            if (!isset($countAttributes[$attribute->getId()])) {
+                continue;
+            }
+            $percent = $countAttributes[$attribute->getId()]*(100/($collection->getSupply()));
+            $attribute->setPercent(round($percent, 5));
+            $this->em->persist($attribute);
+        }
 
-        $collection->setStatus(CollectionStatusEnum::RANK_EXECUTED->value);
+        $collection->setStatus(CollectionStatusEnum::ATTRIBUTE_PERCENT_PROCESSED->value);
         $this->em->flush();
 
-        dump('process END rank');
-    }
-
-    private function processScoreByToken($token)
-    {
-        $sumWithoutNull = 0;
-        /** @var TokenAttribute $tokenAttribute */
-        foreach ($token->getTokenAttributes() as $tokenAttribute) {
-            if ($tokenAttribute->getAttribute()->getValue() !== null) {
-                $sumWithoutNull += $tokenAttribute->getAttribute()->getPercent();
-            }
-        }
-        $rank = new Rank();
-        $rank
-            ->setToken($token)
-            ->setCollection($token->getCollection())
-            ->setHandoScore($sumWithoutNull)
-        ;
-
-        return $rank;
+        dump(' end processAttributePercent');
     }
 
     private function processScoreCollection(Collection $collection): void
@@ -264,7 +254,65 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
         dump('end process ScoreCollection');
     }
 
+    private function processScoreByToken($token)
+    {
+        $sumWithoutNull = 0;
+        /** @var TokenAttribute $tokenAttribute */
+        foreach ($token->getTokenAttributes() as $tokenAttribute) {
+            if ($tokenAttribute->getAttribute()->getValue() !== null) {
+                $sumWithoutNull += $tokenAttribute->getAttribute()->getPercent();
+            }
+        }
+        $rank = new Rank();
+        $rank
+            ->setToken($token)
+            ->setCollection($token->getCollection())
+            ->setHandoScore($sumWithoutNull)
+        ;
 
+        return $rank;
+    }
+
+    public function processRank(Collection $collection): void
+    {
+        $this->processScoreCollection($collection);
+        dump('process rank');
+        $ranking = 1;
+        $limit = 1000;
+        $offset = 0;
+        while ($ranking < $collection->getSupply()) {
+            $ranks = $this->rankRepository->findBy(
+                ['collection' => $collection],
+                ['handoScore' => 'ASC'],
+                $limit,
+                $offset
+            );
+            foreach ($ranks as $rank) {
+                dump("rank id : " . $rank->getId(). ' rank : ' . $ranking);
+                $rank->setHandoRank($ranking);
+                $this->em->persist($rank);
+                $ranking++;
+            }
+            $offset += $limit;
+            $this->em->flush();
+        }
+
+        $collection->setStatus(CollectionStatusEnum::RANK_EXECUTED->value);
+        $this->em->flush();
+
+        dump('process END rank');
+    }
+
+    private function defineTokenByFilename(Collection $collection, string $filename)
+    {
+        if ($collection->getTraitFileExtension()) {
+            $token = substr($filename, 0, strlen($collection->getTraitFileExtension()) + 1);
+        } else {
+            $token = $filename;
+        }
+
+        return abs((int) $token);
+    }
 
     /**
      * @param Collection $collection
