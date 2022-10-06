@@ -49,7 +49,7 @@ class CollectionNFTImportCommand extends Command
         } catch (\Exception $e) {
             throw new \Exception('Error import collection: ' . $e->getMessage());
         }
-
+        $output->writeln(sprintf('Import NFT collection %s finished', $input->getArgument('identifier')));
         return Command::SUCCESS;
     }
 }

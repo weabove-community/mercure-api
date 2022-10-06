@@ -121,8 +121,6 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
         $this->em->flush();
     }
 
-    // todo : à découper
-    // todo compter le nombre d'affectation d'un attribut
     public function processTokenAttributesBinding(Collection $collection): void
     {
         dump('processTokenAttributes');
@@ -222,8 +220,6 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
 
         $collection->setStatus(CollectionStatusEnum::ATTRIBUTE_PERCENT_PROCESSED->value);
         $this->em->flush();
-
-        dump(' end processAttributePercent');
     }
 
     private function processScoreCollection(Collection $collection): void
@@ -251,7 +247,6 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
             }
         }
         $this->em->flush();
-        dump('end process ScoreCollection');
     }
 
     private function processScoreByToken($token)
@@ -278,29 +273,22 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
         $this->processScoreCollection($collection);
         dump('process rank');
         $ranking = 1;
-        $limit = 1000;
-        $offset = 0;
-        while ($ranking < $collection->getSupply()) {
-            $ranks = $this->rankRepository->findBy(
-                ['collection' => $collection],
-                ['handoScore' => 'ASC'],
-                $limit,
-                $offset
-            );
-            foreach ($ranks as $rank) {
-                dump("rank id : " . $rank->getId(). ' rank : ' . $ranking);
-                $rank->setHandoRank($ranking);
-                $this->em->persist($rank);
-                $ranking++;
-            }
-            $offset += $limit;
-            $this->em->flush();
-        }
 
+        $ranks = $this->rankRepository->findBy(
+            ['collection' => $collection],
+            ['handoScore' => 'ASC']
+        );
+
+        foreach ($ranks as $rank) {
+            $rank->setHandoRank($ranking);
+            $this->em->persist($rank);
+            if ($ranking % 500 == 0) {
+                $this->em->flush();
+            }
+            $ranking++;
+        }
         $collection->setStatus(CollectionStatusEnum::RANK_EXECUTED->value);
         $this->em->flush();
-
-        dump('process END rank');
     }
 
     private function defineTokenByFilename(Collection $collection, string $filename)
