@@ -44,4 +44,15 @@ class FileSystem
             $collection->getIdentifier()
         );
     }
+
+    /**
+     * @param Collection $collection
+     * @return bool
+     */
+    public function hasMetadataDirectory(Collection $collection): bool
+    {
+        $directory = $this->getMetadataDirectory($collection);
+
+        return file_exists($directory);
+    }
 }

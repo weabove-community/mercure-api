@@ -54,12 +54,37 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
         $this->tokenService = $tokenService;
     }
 
-    /**
-     * Useless: import metadata manually
-     * solution : ipfs get [merkletree]
-     */
     public function importMetadata(Collection $collection): void
     {
+        dump('import Metadata');
+        $directory = $this->fileSystem->getMetadataDirectory($collection);
+        if (!$this->fileSystem->hasMetadataDirectory($collection)) {
+            throw new \Exception(sprintf('Import metadata before add NFT collection and put in %s', $directory));
+        }
+
+        $files = scandir($directory);
+
+        $strlenExtension = 0;
+        if ($collection->getTraitFileExtension()) {
+            $strlenExtension = strlen($collection->getTraitFileExtension()) + 1;
+        }
+
+        $strlenMetadataFile = strlen(count($files)) + $strlenExtension;
+
+        foreach ($files as $filename) {
+            if (!$this->canHandleFile($collection, $filename)) {
+                continue;
+            }
+
+            $newFilename = str_pad($filename, $strlenMetadataFile, "0", STR_PAD_LEFT);
+            $filenameOrigin = $directory.$filename;
+            $filenameTarget = $directory.$newFilename;
+
+            if(!rename($filenameOrigin, $filenameTarget)) {
+                throw new \Exception('Rename failed ' . $filename);
+            }
+        }
+
         $collection->setStatus(CollectionStatusEnum::METADATA_IMPORTED->value);
         $this->em->persist($collection);
         $this->em->flush();
@@ -157,7 +182,7 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
 
                 $this->em->persist($tokenAttribute);
                 if (0 == $countTokenAttributes % 500) {
-                    dump('flush ' . $count);
+                    echo '.';
                     $this->em->flush();
                 }
                 $countTokenAttributes++;
@@ -237,13 +262,13 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
             );
             $offset += $limit;
             foreach ($tokens as $token) {
-                //dump("persist rank score token id :" . $token->getId());
                 $rank = $this->processScoreByToken($token);
                 $this->em->persist($rank);
                 if ($count % 1000 === 0) {
                     $this->em->flush();
                 }
                 $count++;
+                echo '.';
             }
         }
         $this->em->flush();
@@ -286,6 +311,7 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
                 $this->em->flush();
             }
             $ranking++;
+            echo '.';
         }
         $collection->setStatus(CollectionStatusEnum::RANK_EXECUTED->value);
         $this->em->flush();
