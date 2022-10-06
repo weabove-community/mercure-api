@@ -61,7 +61,7 @@ docker/nginx/log/error.log
 docker/nginx/log/project_access.log
 docker/nginx/log/project_error.log
 .DS_Store
-data/WeAbove/*.json
+data/metadata/
 data/.DS_Store
 
 ###> symfony/webpack-encore-bundle ###
