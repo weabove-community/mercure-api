@@ -43,6 +43,7 @@ class CollectionAddCommand extends Command
             ->addOption('extension-metadata', 'f', InputOption::VALUE_OPTIONAL, 'File metadata extension', null)
             ->addOption('first', 's', InputOption::VALUE_OPTIONAL, 'First token', null)
             ->addOption('last', 'l', InputOption::VALUE_OPTIONAL, 'Last token', null)
+            ->addOption('already-exist', 'a', InputOption::VALUE_NONE, 'Continue process without create')
         ;
     }
 
@@ -54,14 +55,31 @@ class CollectionAddCommand extends Command
             return Command::INVALID;
         }
 
+        if ($input->getOption('already-exist')) {
+            $collection = $this->collectionRepository->findOneByIdentifier($input->getArgument('identifier'));
+        } else {
+            $collection = $this->create($input, $output);
+        }
+
+        try {
+            $this->collectionImport->run($collection);
+        } catch (\Exception $e) {
+            throw new \Exception('Error import collection: ' . $e->getMessage());
+        }
+        $output->writeln(sprintf('Import NFT collection %s finished', $input->getArgument('identifier')));
+
+        return Command::SUCCESS;
+    }
+
+    private function create(InputInterface $input, OutputInterface $output)
+    {
         $collection = new Collection();
         $collection
-            ->setBlockchain($blockchain->value)
+            ->setBlockchain($input->getArgument('blockchain'))
             ->setName($input->getArgument('project'))
             ->setIdentifier($input->getArgument('identifier'))
             ->setStatus(CollectionStatusEnum::ADDED->value)
         ;
-
 
         if (null !== $input->getOption('extension-metadata')) {
             $collection->setTraitFileExtension($input->getOption('extension-metadata'));
@@ -77,13 +95,6 @@ class CollectionAddCommand extends Command
 
         $this->collectionRepository->save($collection, true);
 
-        try {
-            $this->collectionImport->run($collection);
-        } catch (\Exception $e) {
-            throw new \Exception('Error import collection: ' . $e->getMessage());
-        }
-        $output->writeln(sprintf('Import NFT collection %s finished', $input->getArgument('identifier')));
-
-        return Command::SUCCESS;
+        return $collection;
     }
 }
