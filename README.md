@@ -6,8 +6,8 @@ PROJET MERCURE
 ## Collection ERC20
 - Ajouter la nouvelle collection en BDD
 ```
-  php bin/console app:collection:add [blockchain] [project] [identifier] [ipfs] [extension-picture]
-  // php bin/console app:collection:add  ethereum WeAbove 0xd0aaac09e7f9b794fafa9020a34ad5b906566a5c bafybeiani764y53yslrmu2lpyf7ek3idtabvlxvdjbco4sdygtezedagui gif -s 0 -l 1549
+  php bin/console app:collection:add [blockchain] [project] [identifier] [extension-picture]
+  // php bin/console app:collection:add  ethereum WeAbove 0xd0aaac09e7f9b794fafa9020a34ad5b906566a5c gif -s 0 -l 1549
 ```
  
 - Télécharger les fichiers de metadata via IPFS
@@ -32,5 +32,5 @@ PROJET MERCURE
 - ajouter le nombre de trait par NFT
 - mettre à null les traits non défini
 - afficher le prix des NFT par plateforme
-- factoriser l'import de NFT d'une collection
+
 
