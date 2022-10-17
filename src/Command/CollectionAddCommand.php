@@ -19,16 +19,13 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 #[AsCommand(name: 'app:collection:add')]
 class CollectionAddCommand extends Command
 {
-    private FileSystem $fileSystem;
     private CollectionImport $collectionImport;
     private CollectionRepository $collectionRepository;
 
     public function __construct(
-        FileSystem $fileSystem,
         CollectionImport $collectionImport,
         CollectionRepository $collectionRepository)
     {
-        $this->fileSystem = $fileSystem;
         $this->collectionImport = $collectionImport;
         $this->collectionRepository = $collectionRepository;
         parent::__construct();

@@ -33,4 +33,9 @@ PROJET MERCURE
 - mettre à null les traits non défini
 - afficher le prix des NFT par plateforme
 
+# Nice to have
+- refacto Collection import
+- delete argument start & end collection in import command
+- delete option already existe
+
 

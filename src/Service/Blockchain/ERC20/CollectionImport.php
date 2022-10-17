@@ -164,30 +164,45 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
             $json = file_get_contents($directory.$filename);
             $metadata = json_decode($json, true);
             $tokenNumber = $this->defineTokenByFilename($collection, $filename);
-            $token = $this->tokenService->create($collection, $tokenNumber, $metadata['name'], $metadata['image']);
+            try {
+                $token = $this->tokenService->create($collection, $tokenNumber, $metadata['name'], $metadata['image']);
+            } catch (\Exception $e) {
+                throw new \Exception('Cant insert token ' . $tokenNumber);
+            }
 
             $attributeKeyValue = $this->attributeService->sortMetadataAttributesByKeyValue($metadata['attributes']);
+            try {
+                foreach ($nullAttributeData as $traitTypeName => $attributeNull) {
 
-            foreach ($nullAttributeData as $traitTypeName => $attributeNull) {
+                    if (isset($attributeKeyValue[$traitTypeName])) {
+                        $value = $attributeKeyValue[$traitTypeName];
+                        if (is_numeric($value)) {
+                            continue;
+                        }
+                        $attribute = $attributeData[$traitTypeName][$value];
+                    } else {
+                        $attribute = $attributeNull;
+                    }
+                    $tokenAttribute = new TokenAttribute();
+                    $tokenAttribute->setToken($token);
+                    $tokenAttribute->setAttribute($attribute);
 
-                if (isset($attributeKeyValue[$traitTypeName])) {
-                    $value = $attributeKeyValue[$traitTypeName];
-                    $attribute = $attributeData[$traitTypeName][$value];
-                } else {
-                    $attribute = $attributeNull;
+                    $this->em->persist($tokenAttribute);
+                    if (0 == $countTokenAttributes % 500) {
+                        echo '.';
+                        $this->em->flush();
+                    }
+                    $countTokenAttributes++;
                 }
-                $tokenAttribute = new TokenAttribute();
-                $tokenAttribute->setToken($token);
-                $tokenAttribute->setAttribute($attribute);
-
-                $this->em->persist($tokenAttribute);
-                if (0 == $countTokenAttributes % 500) {
-                    echo '.';
-                    $this->em->flush();
-                }
-                $countTokenAttributes++;
+                $count++;
+            } catch (\Exception $e) {
+                throw new \Exception(sprintf('Save token attribute failed : %s, trait %s - value %s',
+                    $e->getMessage(),
+                    $traitTypeName,
+                    $attributeKeyValue[$traitTypeName]
+                ));
             }
-            $count++;
+
         }
 
         $collection
@@ -215,6 +230,9 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
             foreach ($nullAttributeData as $traitTypeName => $nullAttribute) {
                 if (isset($metadataAttributesKeyValue[$traitTypeName])) {
                     $val = $metadataAttributesKeyValue[$traitTypeName];
+                    if (is_numeric($val)) {
+                        continue;
+                    }
                     $attribute = $attributeData[$traitTypeName][$val];
                 } else {
                     $attribute = $nullAttribute;
