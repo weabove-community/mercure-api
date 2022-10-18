@@ -2,10 +2,15 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: Collection::class)]
+#[ORM\Entity]
+#[ApiResource(types: ['https://schema.org/Car'])]
+#[GetCollection(provider: CollectionProvider::class)]
 class Collection
 {
     #[ORM\Id]
@@ -42,12 +47,6 @@ class Collection
 
     #[ORM\Column(nullable: true)]
     private string|null $traitFileExtension = null;
-
-    #[ORM\Column(nullable: true)]
-    private int|null $startId;
-
-    #[ORM\Column(nullable: true)]
-    private int|null $endId;
 
     public function __construct()
     {
@@ -154,42 +153,6 @@ class Collection
     public function setTraitFileExtension(string $traitFileExtension): Collection
     {
         $this->traitFileExtension = $traitFileExtension;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getStartId(): int
-    {
-        return $this->startId;
-    }
-
-    /**
-     * @param int $startId
-     * @return Collection
-     */
-    public function setStartId(int $startId): Collection
-    {
-        $this->startId = $startId;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getEndId(): int
-    {
-        return $this->endId;
-    }
-
-    /**
-     * @param int $endId
-     * @return Collection
-     */
-    public function setEndId(int $endId): Collection
-    {
-        $this->endId = $endId;
         return $this;
     }
 

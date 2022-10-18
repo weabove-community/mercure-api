@@ -38,9 +38,6 @@ class CollectionAddCommand extends Command
             ->addArgument('project', InputArgument::REQUIRED, 'Project name')
             ->addArgument('identifier', InputArgument::REQUIRED, 'Smart contrart or identifier collection')
             ->addOption('extension-metadata', 'f', InputOption::VALUE_OPTIONAL, 'File metadata extension', null)
-            ->addOption('first', 's', InputOption::VALUE_OPTIONAL, 'First token', null)
-            ->addOption('last', 'l', InputOption::VALUE_OPTIONAL, 'Last token', null)
-            ->addOption('already-exist', 'a', InputOption::VALUE_NONE, 'Continue process without create')
         ;
     }
 
@@ -52,9 +49,8 @@ class CollectionAddCommand extends Command
             return Command::INVALID;
         }
 
-        if ($input->getOption('already-exist')) {
-            $collection = $this->collectionRepository->findOneByIdentifier($input->getArgument('identifier'));
-        } else {
+        $collection = $this->collectionRepository->findOneByIdentifier($input->getArgument('identifier'));
+        if ($collection === null) {
             $collection = $this->create($input, $output);
         }
 
@@ -80,14 +76,6 @@ class CollectionAddCommand extends Command
 
         if (null !== $input->getOption('extension-metadata')) {
             $collection->setTraitFileExtension($input->getOption('extension-metadata'));
-        }
-
-        if (null !== $input->getOption('first')) {
-            $collection->setStartId($input->getOption('first'));
-        }
-
-        if (null !== $input->getOption('last')) {
-            $collection->setEndId($input->getOption('last'));
         }
 
         $this->collectionRepository->save($collection, true);
