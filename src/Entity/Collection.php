@@ -2,23 +2,30 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+
 use Doctrine\ORM\Mapping as ORM;
 
+
+
 #[ORM\Entity]
-#[ApiResource(types: ['https://schema.org/Car'])]
-#[GetCollection(provider: CollectionProvider::class)]
+#[ApiResource(normalizationContext: ['groups' => ['get']])]
+#[GetCollection]
+#[Get]
 class Collection
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('get')]
     private int $id;
 
     #[ORM\Column]
+    #[Groups('get')]
     private string $name;
 
     #[ORM\Column]
@@ -28,6 +35,7 @@ class Collection
     private string $status;
 
     #[ORM\Column(nullable: true)]
+    #[Groups('get')]
     private int|null $supply;
 
     #[ORM\Column(unique: true)]

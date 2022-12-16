@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TraitType::class)]
+#[ORM\Entity]
 class TraitType
 {
     #[ORM\Id]
@@ -53,9 +53,9 @@ class TraitType
     }
 
     /**
-     * @return ArrayCollection
+     * @return
      */
-    public function getAttributes(): ArrayCollection
+    public function getAttributes()
     {
         return $this->attributes;
     }
@@ -63,6 +63,16 @@ class TraitType
     public function addAttribute(Attribute $attribute): void
     {
         $this->attributes->add($attribute);
+    }
+
+    /**
+     * @param $attributes
+     * @return $this
+     */
+    public function setAttributes($attributes)
+    {
+        $this->attributes = $attributes;
+        return $this;
     }
 
     /**

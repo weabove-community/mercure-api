@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: Attribute::class)]
+#[ORM\Entity]
 class Attribute
 {
     #[ORM\Id]
@@ -97,7 +97,7 @@ class Attribute
         return $this;
     }
 
-    public function getTokenAttributes(): ArrayCollection
+    public function getTokenAttributes()
     {
         return $this->tokenAttributes;
     }
