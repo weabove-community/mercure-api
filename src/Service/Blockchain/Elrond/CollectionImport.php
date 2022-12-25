@@ -63,7 +63,7 @@ class CollectionImport extends CollectionImportAbstract implements CollectionImp
         ];
 
         if (!$this->fileSystem->hasMetadataDirectory($collection)) {
-            mkdir($this->fileSystem->getMetadataDirectory($collection));
+            mkdir($this->fileSystem->getMetadataDirectory($collection), 0777, true);
         }
         while ($queryParam['from'] <= $collection->getSupply()) {
             $response = $this->collectionApi->getNftsCollection(
