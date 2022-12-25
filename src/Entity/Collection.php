@@ -15,7 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ApiResource(normalizationContext: ['groups' => ['get']])]
 #[GetCollection]
-#[Get]
 class Collection
 {
     #[ORM\Id]
@@ -39,6 +38,7 @@ class Collection
     private int|null $supply;
 
     #[ORM\Column(unique: true)]
+    #[Groups('get')]
     private string $identifier;
 
     #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'collection')]
