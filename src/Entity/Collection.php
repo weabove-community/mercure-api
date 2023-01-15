@@ -6,11 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Get;
-
 use Doctrine\ORM\Mapping as ORM;
-
-
 
 #[ORM\Entity]
 #[ApiResource(normalizationContext: ['groups' => ['get']])]
