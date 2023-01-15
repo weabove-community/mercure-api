@@ -7,14 +7,12 @@ use App\Enum\BlockchainEnum;
 use App\Enum\CollectionStatusEnum;
 use App\Repository\CollectionRepository;
 use App\Service\CollectionImport;
-use App\Service\FileSystem;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 #[AsCommand(name: 'app:collection:add')]
 class CollectionAddCommand extends Command

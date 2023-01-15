@@ -12,4 +12,22 @@ class TokenRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Token::class);
     }
+
+    public function findByTokenIdsAndCollection($identifier, $tokenIds)
+    {
+        $query = $this->createQueryBuilder('t')
+            ->leftJoin('t.collection', 'c')
+            ->leftJoin('t.tokenAttributes', 'ta')
+            ->leftJoin('ta.attribute', 'a')
+        ;
+
+        return $query
+            ->andWhere('t.token in (:tokens)')
+            ->andWhere('c.identifier = :identifier')
+            ->setParameter('tokens', $tokenIds)
+            ->setParameter('identifier', $identifier)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
