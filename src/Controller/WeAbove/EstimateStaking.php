@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 #[Route('/weabove/estimate-staking')]
 class EstimateStaking extends AbstractController
@@ -19,15 +20,16 @@ class EstimateStaking extends AbstractController
     }
 
     #[Route('/{wallet}', name: 'weabove-estimate-staking')]
-    public function process($wallet)
+    public function process($wallet, $withDetails = false)
     {
+        $prime = $this->processStakingGRV->getPrimeTokensFromWallet($wallet, $withDetails);
+        $ordos = $this->processStakingGRV->getOrdosTokensFromWallet($wallet, $withDetails);
         $result = [
             'wallet-address' => $wallet,
-            'prime' => $this->processStakingGRV->getPrimeTokensFromWallet($wallet),
-            'ordos' =>  $this->processStakingGRV->getOrdosTokensFromWallet($wallet)
+            'total' => $prime['sum'] + $ordos['sum'],
+            'prime' => $prime,
+            'ordos' => $ordos
         ];
-
-
 
         return new JsonResponse($result);
     }

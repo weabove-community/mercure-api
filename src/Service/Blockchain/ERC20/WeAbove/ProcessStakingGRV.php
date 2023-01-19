@@ -9,18 +9,24 @@ use GuzzleHttp\Client;
 
 class ProcessStakingGRV
 {
-    const SC_PRIME = '0xd0aaac09e7f9b794fafa9020a34ad5b906566a5c';
-    const SC_ORDOS = '0xd4b1a63cb167968abf039a858c3745228fff937d';
-
     const ETHERSCAN_API_URL = 'https://api.etherscan.io/api';
 
+    const LABEL_PRIME = 'prime';
+    const LABEL_ORDOS = 'ordos-database';
+
+    const COLLECTIONS =
+        [
+            self::LABEL_PRIME => '0xd0aaac09e7f9b794fafa9020a34ad5b906566a5c',
+            self::LABEL_ORDOS => '0xd4b1a63cb167968abf039a858c3745228fff937d',
+        ];
+
     const MECHANICS = [
-        self::SC_PRIME => [
+        self::COLLECTIONS[self::LABEL_PRIME] => [
             'basic' => 5,
             'special' => 9,
             'unique' => 14,
         ],
-        self::SC_ORDOS => [
+        self::COLLECTIONS[self::LABEL_ORDOS] => [
             'basic' => 1,
             'special' => 3,
             'unique' => 7,
@@ -167,21 +173,23 @@ class ProcessStakingGRV
         return $sum;
     }
 
-    public function process($tokens, $identifier): int
+    public function process($tokens, $identifier): array
     {
         $sum = 0;
+        $details = [];
         foreach ($tokens as $token) {
-
             /** @var Token $token */
             $sumBase = $this->processBase($token, $identifier);
             $sumBonus = $this->processBonus($token);
-            $sum += $sumBase + $sumBonus;
+            $details[$token->getToken()]['rewards'] = $sumBase + $sumBonus;
+            $details[$token->getToken()]['img'] = $token->getImageUrl();
+            $sum += $details[$token->getToken()]['rewards'];
         }
 
-        return $sum;
+        return ['sum' => $sum, 'details' => $details];
     }
 
-    public function getTokensFromWallet($wallet, $smartContractAddress)
+    public function getTokensFromWallet($wallet, $smartContractAddress): array
     {
         $client = new Client();
         $response = $client->request('GET', self::ETHERSCAN_API_URL, [
@@ -204,13 +212,13 @@ class ProcessStakingGRV
         return $this->process($tokens, $smartContractAddress);
     }
 
-    public function getPrimeTokensFromWallet($wallet)
+    public function getPrimeTokensFromWallet($wallet): array
     {
-        return $this->getTokensFromWallet($wallet, self::SC_PRIME);
+        return $this->getTokensFromWallet($wallet, self::COLLECTIONS[self::LABEL_PRIME]);
     }
 
-    public function getOrdosTokensFromWallet($wallet)
+    public function getOrdosTokensFromWallet($wallet): array
     {
-        return $this->getTokensFromWallet($wallet, self::SC_ORDOS);
+        return $this->getTokensFromWallet($wallet, self::COLLECTIONS[self::LABEL_ORDOS]);
     }
 }
