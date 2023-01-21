@@ -30,7 +30,11 @@ class EstimateStaking extends AbstractController
             'prime' => $prime,
             'ordos' => $ordos
         ];
+        $response = new JsonResponse($result);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
 
-        return new JsonResponse($result);
+        return $response;
     }
 }
