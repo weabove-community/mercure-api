@@ -3,24 +3,17 @@
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
-#[ApiResource(normalizationContext: ['groups' => ['get']])]
-#[GetCollection]
+#[ORM\Entity(repositoryClass: Collection::class)]
 class Collection
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('get')]
     private int $id;
 
     #[ORM\Column]
-    #[Groups('get')]
     private string $name;
 
     #[ORM\Column]
@@ -30,11 +23,9 @@ class Collection
     private string $status;
 
     #[ORM\Column(nullable: true)]
-    #[Groups('get')]
     private int|null $supply;
 
     #[ORM\Column(unique: true)]
-    #[Groups('get')]
     private string $identifier;
 
     #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'collection')]
