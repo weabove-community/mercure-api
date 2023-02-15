@@ -4,10 +4,19 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
+use Hateoas\Configuration\Annotation as Hateoas;
 
+/**
+ * @Hateoas\Relation(
+ *     "self",
+ *     href = "expr('/api/collections/' ~ object.getIdentifier())"
+ * )
+ */
 #[ORM\Entity(repositoryClass: Collection::class)]
 class Collection
 {
+    #[JMS\Exclude]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -28,18 +37,23 @@ class Collection
     #[ORM\Column(unique: true)]
     private string $identifier;
 
+    #[JMS\Exclude]
     #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'collection')]
     private $tokens;
 
+    #[JMS\Exclude]
     #[ORM\OneToMany(targetEntity: TraitType::class, mappedBy: 'collection')]
     private $traitTypes;
 
+    #[JMS\Exclude]
     #[ORM\OneToMany(targetEntity: Attribute::class, mappedBy: 'collection')]
     private $attributes;
 
+    #[JMS\Exclude]
     #[ORM\OneToMany(targetEntity: Rank::class, mappedBy: 'collection')]
     private $ranks;
 
+    #[JMS\Exclude]
     #[ORM\Column(nullable: true)]
     private string|null $traitFileExtension = null;
 

@@ -4,30 +4,45 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 
+use Hateoas\Configuration\Annotation as Hateoas;
+
+/**
+ * @Hateoas\Relation(
+ *     "self",
+ *     href = "expr('/api/tokens/' ~ object.getCollection().getIdentifier() ~ '/' ~ object.getToken())"
+ * )
+ */
 #[ORM\Entity(repositoryClass: Token::class)]
 class Token
 {
+    #[JMS\Exclude]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private int $id;
 
+    #[JMS\Expose]
     #[ORM\Column]
     private int $token;
 
+    #[JMS\Expose]
     #[ORM\Column]
     private string $name;
 
+    #[JMS\Exclude]
     #[ORM\OneToOne(targetEntity: Rank::class, mappedBy: 'token')]
     private Rank|null $rank;
 
+    #[JMS\Exclude]
     #[ORM\OneToMany(targetEntity: TokenAttribute::class, mappedBy: 'token')]
     private $tokenAttributes;
 
     #[ORM\ManyToOne(targetEntity: Collection::class, inversedBy: 'tokens', cascade: ['persist'])]
     private Collection $collection;
 
+    #[JMS\Expose]
     #[ORM\Column]
     private string $imageUrl;
 

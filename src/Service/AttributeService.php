@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Collection;
+use App\Entity\Token;
+use App\Entity\TokenAttribute;
 use App\Repository\AttributeRepository;
 
 class AttributeService
@@ -71,4 +73,17 @@ class AttributeService
         return $attributeData;
     }
 
+    public function render(Token $token)
+    {
+        $res = [];
+        /** @var TokenAttribute $tokenAttribute */
+        foreach ($token->getTokenAttributes() as $tokenAttribute) {
+            if ($tokenAttribute->getAttribute()->getValue() === null) {
+                continue;
+            }
+            $traitTypeName = $tokenAttribute->getAttribute()->getTraitType()->getName();
+            $res[$traitTypeName] = $tokenAttribute->getAttribute()->getValue();
+        }
+        return $res;
+    }
 }

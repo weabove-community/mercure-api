@@ -30,4 +30,43 @@ class TokenRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function findByCollectionIdentifier($identifier, $limit = 50, $options=array())
+    {
+        $query = $this->createQueryBuilder('t')
+            ->leftJoin('t.collection', 'c')
+        ;
+
+        return $query
+            ->andWhere('c.identifier = :identifier')
+            ->setParameter('identifier', $identifier)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * @param $identifier
+     * @param $token
+     * @return
+     */
+    public function findOneByCollectionIdentifierAndToken($identifier, $token)
+    {
+        $query = $this->createQueryBuilder('t')
+            ->leftJoin('t.collection', 'c')
+            ->leftJoin('t.tokenAttributes', 'ta')
+            ->leftJoin('ta.attribute', 'a')
+            ->leftJoin('a.traitType', 'tt')
+        ;
+
+        return $query
+            ->andWhere('c.identifier = :identifier')
+            ->andWhere('t.token = :token')
+            ->setParameter('identifier', $identifier)
+            ->setParameter('token', $token)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }
