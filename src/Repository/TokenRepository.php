@@ -31,7 +31,7 @@ class TokenRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findByCollectionIdentifier($identifier, $limit = 50, $options=array())
+    public function findByCollectionIdentifier($identifier, $limit = 50, $offset = 1)
     {
         $query = $this->createQueryBuilder('t')
             ->leftJoin('t.collection', 'c')
@@ -41,6 +41,7 @@ class TokenRepository extends ServiceEntityRepository
             ->andWhere('c.identifier = :identifier')
             ->setParameter('identifier', $identifier)
             ->setMaxResults($limit)
+            ->setFirstResult($offset)
             ->getQuery()
             ->getResult()
         ;
