@@ -18,6 +18,13 @@ class ProcessStakingGRV
             self::LABEL_ORDOS => '0xd4b1a63cb167968abf039a858c3745228fff937d',
         ];
 
+    const SUBTITLE_OFFSET_STR =
+        [
+            self::LABEL_PRIME => 9,
+            self::LABEL_ORDOS => 1,
+        ];
+
+
     const MECHANICS = [
         self::COLLECTIONS[self::LABEL_PRIME] => [
             'basic' => 5,
@@ -187,7 +194,35 @@ class ProcessStakingGRV
         return ['sum' => $sum, 'details' => $details];
     }
 
-    public function getTokensFromWallet($wallet, $smartContractAddress): array
+    public function getTokensFromWallet($wallet, $smartContractAddress, $substrOffset): array
+    {
+        $tokenIds = $this->extractTokenNumber($wallet, $smartContractAddress, $substrOffset);
+
+        $tokens = $this->tokenRepository->findByTokenIdsAndCollection($smartContractAddress, $tokenIds);
+        return $this->process($tokens, $smartContractAddress);
+    }
+
+    public function getPrimeTokensFromWallet($wallet): array
+    {
+        return
+            $this->getTokensFromWallet(
+                $wallet,
+                self::COLLECTIONS[self::LABEL_PRIME],
+                self::SUBTITLE_OFFSET_STR[self::LABEL_PRIME]
+            );
+    }
+
+    public function getOrdosTokensFromWallet($wallet): array
+    {
+        return
+            $this->getTokensFromWallet(
+                $wallet,
+                self::COLLECTIONS[self::LABEL_ORDOS],
+                self::SUBTITLE_OFFSET_STR[self::LABEL_ORDOS]
+            );
+    }
+
+    public function extractTokenNumber($wallet, $smartContractAddress, $subtitleOffset)
     {
         $response = $this->alchemyClient->getNFTsCollectionsByOwner(
             $smartContractAddress,
@@ -199,20 +234,9 @@ class ProcessStakingGRV
 
         $tokenIds = [];
         foreach ($data as $nft) {
-            $tokenIds[] = substr($nft['metadata']['name'], 9);
+            $tokenIds[] = substr($nft['metadata']['name'], $subtitleOffset);
         }
 
-        $tokens = $this->tokenRepository->findByTokenIdsAndCollection($smartContractAddress, $tokenIds);
-        return $this->process($tokens, $smartContractAddress);
-    }
-
-    public function getPrimeTokensFromWallet($wallet): array
-    {
-        return $this->getTokensFromWallet($wallet, self::COLLECTIONS[self::LABEL_PRIME]);
-    }
-
-    public function getOrdosTokensFromWallet($wallet): array
-    {
-        return $this->getTokensFromWallet($wallet, self::COLLECTIONS[self::LABEL_ORDOS]);
+        return $tokenIds;
     }
 }

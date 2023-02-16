@@ -5,9 +5,7 @@ namespace App\Controller\WeAbove;
 use App\Service\Blockchain\ERC20\WeAbove\ProcessStakingGRV;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 #[Route('/weabove/estimate-staking')]
 class EstimateStaking extends AbstractController
