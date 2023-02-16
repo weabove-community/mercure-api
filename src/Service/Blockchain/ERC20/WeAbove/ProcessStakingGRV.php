@@ -5,12 +5,10 @@ namespace App\Service\Blockchain\ERC20\WeAbove;
 use App\Entity\Token;
 use App\Entity\TokenAttribute;
 use App\Repository\TokenRepository;
-use GuzzleHttp\Client;
+use App\Service\Alchemy\Client as AlchemyClient;
 
 class ProcessStakingGRV
 {
-    const ETHERSCAN_API_URL = 'https://api.etherscan.io/api';
-
     const LABEL_PRIME = 'prime';
     const LABEL_ORDOS = 'ordos-database';
 
@@ -33,19 +31,19 @@ class ProcessStakingGRV
         ],
     ];
 
-    /** @var string */
-    private $etherscanApiKey;
-
     /** @var TokenRepository */
     private $tokenRepository;
 
+    /** @var AlchemyClient */
+    private $alchemyClient;
+
     /**
-     * @param string          $etherscanApiKey
+     * @param AlchemyClient $alchemyClient
      * @param TokenRepository $tokenRepository
      */
-    public function __construct(string $etherscanApiKey, TokenRepository $tokenRepository)
+    public function __construct(TokenRepository $tokenRepository, AlchemyClient $alchemyClient)
     {
-        $this->etherscanApiKey = $etherscanApiKey;
+        $this->alchemyClient = $alchemyClient;
         $this->tokenRepository = $tokenRepository;
     }
 
@@ -191,21 +189,17 @@ class ProcessStakingGRV
 
     public function getTokensFromWallet($wallet, $smartContractAddress): array
     {
-        $client = new Client();
-        $response = $client->request('GET', self::ETHERSCAN_API_URL, [
-            'query' => [
-                'module' => 'account',
-                'action' => 'addresstokennftinventory',
-                'address' => $wallet,
-                'contractaddress' => $smartContractAddress,
-                'apikey' => $this->etherscanApiKey
-            ]
-        ]);
+        $response = $this->alchemyClient->getNFTsCollectionsByOwner(
+            $smartContractAddress,
+            $wallet
+        );
 
-        $data = json_decode($response->getBody()->getContents(), true);
+        $content = json_decode($response->getBody()->getContents(), true);
+        $data = $content['ownedNfts'];
+
         $tokenIds = [];
-        foreach ($data['result'] as $tokenData) {
-            $tokenIds[] = $tokenData['TokenId'];
+        foreach ($data as $nft) {
+            $tokenIds[] = substr($nft['metadata']['name'], 9);
         }
 
         $tokens = $this->tokenRepository->findByTokenIdsAndCollection($smartContractAddress, $tokenIds);
