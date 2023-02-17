@@ -33,12 +33,9 @@ class EstimateGRVByWalletCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $sumPrime = $this->processStakingGRV->getPrimeTokensFromWallet($input->getArgument('wallet'));
-        $sumOrdos = $this->processStakingGRV->getOrdosTokensFromWallet($input->getArgument('wallet'));
+        $res = $this->processStakingGRV->getTokensFromWallet($input->getArgument('wallet'));
 
-        $output->writeln(sprintf('Prime: %s', $sumPrime));
-        $output->writeln(sprintf('Ordos: %s', $sumOrdos));
-        $output->writeln(sprintf('Total: %s', $sumOrdos + $sumPrime));
+        dump($res);
 
         return Command::SUCCESS;
     }

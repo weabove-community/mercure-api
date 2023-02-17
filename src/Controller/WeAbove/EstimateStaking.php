@@ -20,13 +20,16 @@ class EstimateStaking extends AbstractController
     #[Route('/{wallet}', name: 'weabove-estimate-staking')]
     public function process($wallet)
     {
-        $prime = $this->processStakingGRV->getPrimeTokensFromWallet($wallet);
-        $ordos = $this->processStakingGRV->getOrdosTokensFromWallet($wallet);
+        $res = $this->processStakingGRV->getTokensFromWallet($wallet);
+        $prime = $res['prime'];
+        $ordos = $res['ordos'];
+        $lore = $res['lore'];
         $result = [
             'wallet-address' => $wallet,
-            'total' => $prime['sum'] + $ordos['sum'],
+            'total' => $prime['sum'] + $ordos['sum'] + $lore['sum'],
             'prime' => $prime,
-            'ordos' => $ordos
+            'ordos' => $ordos,
+            'lore' => $lore,
         ];
         $response = new JsonResponse($result);
         $response->headers->set('Content-Type', 'application/json');
