@@ -190,7 +190,7 @@ class ProcessStakingGRV
             }
 
             return [
-                'sum' => count($token)*20,
+                'sum' => count($tokens)*20,
                 'details' => $details
             ];
         }
