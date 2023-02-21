@@ -13,18 +13,31 @@ class ProcessStakingGRV
     const LABEL_ORDOS = 'ordos-database';
     const LABEL_LORE = 'lore-edition';
 
-    const COLLECTIONS =
-        [
-            self::LABEL_PRIME => '0xd0aaac09e7f9b794fafa9020a34ad5b906566a5c',
-            self::LABEL_ORDOS => '0xd4b1a63cb167968abf039a858c3745228fff937d',
-            self::LABEL_LORE => '0x495f947276749ce646f68ac8c248420045cb7b5e',
-        ];
+    const COLLECTIONS = [
+        self::LABEL_PRIME => '0xd0aaac09e7f9b794fafa9020a34ad5b906566a5c',
+        self::LABEL_ORDOS => '0xd4b1a63cb167968abf039a858c3745228fff937d',
+        self::LABEL_LORE => '0x495f947276749ce646f68ac8c248420045cb7b5e',
+    ];
 
-    const SUBTITLE_OFFSET_STR =
-        [
-            self::LABEL_PRIME => 9,
-            self::LABEL_ORDOS => 1,
-        ];
+    const LORE_COLLECTION = [
+        "Assa Ikeba - 'Ordo'",
+        "Aren Cross - 'The Phoenix'",
+        "Malady Holmes - 'The Plaguebearer'",
+        "André Vidocq - 'Inspector Princeps'",
+        "Ash - 'The Gorgon'",
+        "Kāmaloka 'The Clairvoyant'",
+        "Lison Karimov - 'Fulgur'",
+        "Maëlle Ishta - 'Yogi Master'",
+        "Neu Bouth - 'Bouth'",
+        "Rebekha Havoc - 'Rebbi'",
+        "Telmond Sabhir - 'The Artificer'",
+        "The Prophet"
+    ];
+
+    const SUBTITLE_OFFSET_STR = [
+        self::LABEL_PRIME => 9,
+        self::LABEL_ORDOS => 1,
+    ];
 
 
     const MECHANICS = [
@@ -239,7 +252,9 @@ class ProcessStakingGRV
                 continue;
             }
 
-            $tokenNumberLore[] = $nft['metadata'];
+            if (in_array($nft['metadata'], self::LORE_COLLECTION)) {
+                $tokenNumberLore[] = $nft['metadata'];
+            }
         }
         $primeTokens = $this->tokenRepository->findByTokenIdsAndCollection(self::COLLECTIONS[self::LABEL_PRIME], $tokenNumberPrime);
         $ordosTokens = $this->tokenRepository->findByTokenIdsAndCollection(self::COLLECTIONS[self::LABEL_ORDOS], $tokenNumberOrdos);
