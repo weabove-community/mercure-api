@@ -251,8 +251,8 @@ class ProcessStakingGRV
                 $tokenNumberPrime[] = substr($nft['metadata']['name'], self::SUBTITLE_OFFSET_STR[self::LABEL_PRIME]);
                 continue;
             }
-
-            if (in_array($nft['metadata'], self::LORE_COLLECTION)) {
+            
+            if (in_array($nft['title'], self::LORE_COLLECTION)) {
                 $tokenNumberLore[] = $nft['metadata'];
             }
         }
