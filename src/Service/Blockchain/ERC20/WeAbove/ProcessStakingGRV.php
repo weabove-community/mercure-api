@@ -221,29 +221,53 @@ class ProcessStakingGRV
         return ['sum' => $sum, 'details' => $details];
     }
 
+    private function needFoundAllOrdosToken($wallet): bool
+    {
+        $response = $this->alchemyClient->getContractsForOwner($wallet);
+        $data = json_decode($response->getBody()->getContents(), true);
+        foreach ($data['contracts'] as $contractDataOwner) {
+            if ($contractDataOwner['address'] != self::COLLECTIONS[self::LABEL_ORDOS]) {
+                continue;
+            }
+
+            if ($contractDataOwner['totalBalance'] > 100) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @param string $wallet
      * @return array
      */
     public function getTokensFromWallet($wallet): array
     {
+        $tokenNumberOrdos = [];
+        $response = $this->alchemyClient->getOwnersForCollection(self::COLLECTIONS[self::LABEL_ORDOS]);
+        $data = json_decode($response->getBody()->getContents(), true);
+
+        foreach ($data['ownerAddresses'] as $ownerContractData) {
+            if ($ownerContractData['ownerAddress'] === strtolower($wallet) ) {
+                foreach ($ownerContractData['tokenBalances'] as $tokenBalance) {
+                    $tokenNumberOrdos[] = hexdec($tokenBalance['tokenId']);
+                }
+                break;
+            }
+        }
+
         $response = $this->alchemyClient->getNFTsCollectionsByOwner(
             array_values(self::COLLECTIONS),
             $wallet
         );
         $data = json_decode($response->getBody()->getContents(), true);
         $tokenNumberPrime = [];
-        $tokenNumberOrdos = [];
         $tokenNumberLore = [];
 
         $contracts = array_values(self::COLLECTIONS);
         foreach ($data['ownedNfts'] as $nft) {
             if (!in_array($nft['contract']['address'], $contracts, true)) {
-                continue;
-            }
-
-            if ($nft['contract']['address'] === self::COLLECTIONS[self::LABEL_ORDOS]) {
-                $tokenNumberOrdos[] = substr($nft['metadata']['name'], self::SUBTITLE_OFFSET_STR[self::LABEL_ORDOS]);
                 continue;
             }
 
