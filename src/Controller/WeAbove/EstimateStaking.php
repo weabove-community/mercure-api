@@ -24,9 +24,11 @@ class EstimateStaking extends AbstractController
         $prime = $res['prime'];
         $ordos = $res['ordos'];
         $lore = $res['lore'];
+        $sum = $prime['sum'] + $ordos['sum'] + $lore['sum'];
         $result = [
             'wallet-address' => $wallet,
-            'total' => $prime['sum'] + $ordos['sum'] + $lore['sum'],
+            'overflow' => $sum - 200 > 0 ? $sum - 200 : 0,
+            'total' => $sum,
             'prime' => $prime,
             'ordos' => $ordos,
             'lore' => $lore,
