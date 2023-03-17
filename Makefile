@@ -1,5 +1,5 @@
 stack_name = mercure
-php_container_id = $(shell docker ps --filter name="$(stack_name)-php-fpm-1" -q)
+php_container_id = $(shell docker ps --filter name="mercure_back" -q)
 DOCKER=docker-compose
 
 default: help
@@ -15,7 +15,7 @@ help::
 	@printf "\033[32m   composer-install       \033[39m run composer install in docker\n"
 	@printf "\033[32m   composer-update        \033[39m run composer update in docker\n"
 	@printf "\033[32m   composer-require       \033[39m run composer require in docker (package="group/mypackage-bundle")\n"
-	@printf "\033[32m   shell                  \033[39m shell \n"
+	@printf "\033[32m   sh_back                \033[39m shell back \n"
 	@printf "\033[32m   env-dev                \033[39m copy .env-dev to .env \n"
 	@printf "\n"
 	@printf "\033[32m   db-reset               \033[39m run db creation, update commands and load fixture in docker\n"
@@ -56,8 +56,8 @@ start:
 	$(DOCKER) up -d --remove-orphans
 	@printf "\n"
 
-.PHONY: shell
-shell:
+.PHONY: sh_back
+sh_back:
 	@printf "\033[90;44m           Command sh into container php-fpm          \033[39;0m\n"
 	@printf "\n"
 	docker exec -it "$(php_container_id)" /bin/bash

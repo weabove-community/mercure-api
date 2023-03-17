@@ -1,17 +1,5 @@
 version: '3.6'
 services:
-  nginx:
-    build: docker/nginx
-    ports:
-      - '8080:80'
-    volumes:
-      - './:/var/www'
-      - './docker/nginx/log:/var/log/nginx/'
-
-  php-fpm:
-    build: docker/php-fpm
-    volumes:
-      - './:/var/www'
 
   mariadb:
     image: 'mariadb:10.6'
@@ -30,3 +18,17 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       PMA_HOST: mariadb
+
+  nginx:
+    build: ./docker/nginx
+    ports:
+      - '8080:80'
+    volumes:
+      - './:/var/www'
+      - './docker/nginx/log:/var/log/nginx/'
+
+  php-fpm:
+    build: ./docker/php-fpm
+    container_name: mercure_back
+    volumes:
+      - './:/var/www'
