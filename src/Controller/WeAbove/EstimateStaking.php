@@ -3,6 +3,7 @@
 namespace App\Controller\WeAbove;
 
 use App\Service\Blockchain\ERC20\WeAbove\ProcessStakingGRV;
+use App\Service\Blockchain\ERC20\WeAbove\StatusService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,9 +13,11 @@ class EstimateStaking extends AbstractController
 {
     private $processStakingGRV;
 
-    public function __construct(ProcessStakingGRV $processStakingGRV)
+    public function __construct(ProcessStakingGRV $processStakingGRV,
+                                StatusService $statusService)
     {
         $this->processStakingGRV = $processStakingGRV;
+        $this->statusService = $statusService;
     }
 
     #[Route('/{wallet}', name: 'weabove-estimate-staking')]
@@ -28,6 +31,7 @@ class EstimateStaking extends AbstractController
         $result = [
             'wallet-address' => $wallet,
             'overflow' => $sum - 200 > 0 ? $sum - 200 : 0,
+            'status' => $this->statusService->define($sum),
             'total' => $sum,
             'prime' => $prime,
             'ordos' => $ordos,
