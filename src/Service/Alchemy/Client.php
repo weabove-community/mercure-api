@@ -13,6 +13,7 @@ class Client
     const METHOD_GET_OWNER_FOR_COLLECTION   = 'getOwnersForCollection';
     const METHOD_GET_NFTS                   = 'getNFTs';
     const METHOD_GET_CONTRACTS_FOR_OWNER    = 'getContractsForOwner';
+    const METHOD_GET_FLOOR_PRICE            = 'getFloorPrice';
 
     /**
      * @param string $method
@@ -77,6 +78,20 @@ class Client
         $options = [
             'query' => $this->buildQuery([
                 'owner' => $owner,
+                'withMetadata' => 'false'
+            ])
+        ];
+
+        $client = new GuzzleClient();
+        return $client->request('GET', $uri, $options);
+    }
+
+    public function getFloorPrice(string $smartContract): Response
+    {
+        $uri = $this->buildUri(self::METHOD_GET_FLOOR_PRICE);
+        $options = [
+            'query' => $this->buildQuery([
+                'contractAddress' => $smartContract,
                 'withMetadata' => 'false'
             ])
         ];
