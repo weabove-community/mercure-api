@@ -1,15 +1,23 @@
-version: '3.6'
 services:
 
   mariadb:
-    image: 'mariadb:10.6'
+    container_name: mercure_mariadb
+    image: mariadb:10.6
+    platform: linux/arm64 # Optimisation pour les puces Apple Silicon
     environment:
-      - MARIADB_DATABASE=mercure
-      - MARIADB_ROOT_USER=root
-      - MARIADB_ROOT_PASSWORD=root
-      - ALLOW_EMPTY_PASSWORD=yes
+      MARIADB_DATABASE: mercure
+      MARIADB_ROOT_USER: root
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql # Volume persistant pour les données
+    networks:
+      - app_network
 
   phpmyadmin:
+    container_name: mercure_phpmyadmin
     image: phpmyadmin/phpmyadmin
     depends_on:
       - mariadb
@@ -18,8 +26,12 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       PMA_HOST: mariadb
+      UPLOAD_LIMIT: 300M
+    networks:
+      - app_network
 
   nginx:
+    container_name: mercure_nginx
     build: ./docker/nginx
     ports:
       - '8080:80'
@@ -28,7 +40,14 @@ services:
       - './docker/nginx/log:/var/log/nginx/'
 
   php-fpm:
-    build: ./docker/php-fpm
     container_name: mercure_back
+    build: ./docker/php-fpm
     volumes:
       - './:/var/www'
+
+volumes:
+  db_data:
+
+networks:
+  app_network:
+    driver: bridge

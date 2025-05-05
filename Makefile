@@ -1,6 +1,6 @@
 stack_name = mercure
 php_container_id = $(shell docker ps --filter name="mercure_back" -q)
-DOCKER=docker-compose
+DOCKER=docker compose
 
 default: help
 
